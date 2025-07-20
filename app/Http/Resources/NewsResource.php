@@ -22,13 +22,7 @@ class NewsResource extends JsonResource
         return [
             'success'   => $this->status,
             'message'   => $this->message,
-            'data'      => [
-                'data' => $this->resource->items(),
-                'current_page' => $this->resource->currentPage(),
-                'last_page' => $this->resource->lastPage(),
-                'per_page' => $this->resource->perPage(),
-                'total' => $this->resource->total()
-            ]
+            'data'      => $this->resource
         ];
     }
 }
