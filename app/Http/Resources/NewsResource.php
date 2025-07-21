@@ -7,22 +7,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class NewsResource extends JsonResource
 {
-    public $status;
-    public $message;
-
-    public function __construct($status, $message, $resource)
-    {
-        parent::__construct($resource);
-        $this->status  = $status;
-        $this->message = $message;
-    }
-
     public function toArray(Request $request): array
     {
         return [
-            'success'   => $this->status,
-            'message'   => $this->message,
-            'data'      => $this->resource
+            'id' => $this->id,
+            'image' => $this->image,
+            'title' => $this->title,
+            'content' => $this->content,
         ];
     }
 }
