@@ -9,6 +9,7 @@ use App\Interfaces\NewsRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\NewsResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
@@ -19,73 +20,82 @@ class NewsController extends Controller
     {
         $this->newsRepositoryInterface = $newsRepositoryInterface;
     }
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         $data = $this->newsRepositoryInterface->index();
-        return ApiResponseClass::sendResponse(NewsResource::collection($data),'',200);
+        return ApiResponseClass::sendResponse(NewsResource::collection($data), '', 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    public function create() {}
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreNewsRequest $request)
     {
+        $image = $request->file('image');
+        $imageName = $image->hashName();
+        $image->storeAs('public/news', $imageName);
         $details = [
             'title' => $request->title,
-            'image' => $request->image,
+            'image' => $imageName,
             'content' => $request->content
         ];
+
         DB::beginTransaction();
         try {
             $news = $this->newsRepositoryInterface->store($details);
-
             DB::commit();
             return ApiResponseClass::sendResponse(new NewsResource($news), 'News Create Successful', 201);
-        } catch(\Exception $exc) {
+        } catch (\Exception $exc) {
+            Storage::delete('public/news' . $imageName);
             return ApiResponseClass::rollback($exc);
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        $news = $this->newsRepositoryInterface->getById($id);
+        return ApiResponseClass::sendResponse(new NewsResource($news), '', 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(string $id) {}
+
+    public function update(UpdateNewsRequest $request, string $id)
     {
-        //
+        $image = $request->file('image');
+        $imageName = $image->hashName();
+        $image->storeAs('public/news', $imageName);
+        
+        if ($request->hasFile('image')) {
+            $updateDetails = [
+                'title' => $request->title,
+                'image' => $imageName,
+                'content' => $request->content
+            ];
+        } else {
+            $updateDetails = [
+                'title' => $request->title,
+                'content' => $request->content
+            ];
+        }
+        
+        DB::beginTransaction();
+        try {
+            $existingNews = $this->newsRepositoryInterface->getById($id);
+            Storage::delete('public/news' . $existingNews->image);
+            $news = $this->newsRepositoryInterface->update($updateDetails, $id);
+            DB::commit();
+            return ApiResponseClass::sendResponse(new NewsResource($news), 'News Update Successful', 201);
+        } catch (\Exception $exc) {
+            Storage::delete('public/news' . $imageName);
+            return ApiResponseClass::rollback($exc);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $existingNews = $this->newsRepositoryInterface->getById($id);
+        Storage::delete('public/news' . $existingNews->image);
+        $news = $this->newsRepositoryInterface->delete($id);
+        return ApiResponseClass::sendResponse(new NewsResource($news), 'News Delete Successful', 204);
     }
 }

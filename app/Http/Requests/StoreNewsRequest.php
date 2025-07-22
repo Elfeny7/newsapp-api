@@ -24,7 +24,7 @@ class StoreNewsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'title' => 'required',
             'content' => 'required'
         ];
@@ -36,6 +36,6 @@ class StoreNewsRequest extends FormRequest
             'success' => false,
             'message' => 'Validation errors',
             'data'    => $validator->errors()
-        ]));
+        ], 422));
     }
 }

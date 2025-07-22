@@ -24,7 +24,6 @@ class UpdateNewsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'required',
             'title' => 'required',
             'content' => 'required'
         ];
@@ -36,6 +35,6 @@ class UpdateNewsRequest extends FormRequest
             'success' => false,
             'message' => 'Validation errors',
             'data'    => $validator->errors()
-        ]));
+        ], 422));
     }
 }
