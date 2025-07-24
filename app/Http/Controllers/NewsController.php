@@ -33,7 +33,7 @@ class NewsController extends Controller
     {
         $image = $request->file('image');
         $imageName = $image->hashName();
-        $image->storeAs('public/news', $imageName);
+        $image->storeAs('public/news/', $imageName);
         $details = [
             'title' => $request->title,
             'image' => $imageName,
@@ -46,7 +46,7 @@ class NewsController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new NewsResource($news), 'News Create Successful', 201);
         } catch (\Exception $exc) {
-            Storage::delete('public/news' . $imageName);
+            Storage::delete('public/news/' . $imageName);
             return ApiResponseClass::rollback($exc);
         }
     }
@@ -61,32 +61,39 @@ class NewsController extends Controller
 
     public function update(UpdateNewsRequest $request, string $id)
     {
-        $image = $request->file('image');
-        $imageName = $image->hashName();
-        $image->storeAs('public/news', $imageName);
-        
-        if ($request->hasFile('image')) {
-            $updateDetails = [
-                'title' => $request->title,
-                'image' => $imageName,
-                'content' => $request->content
-            ];
-        } else {
-            $updateDetails = [
-                'title' => $request->title,
-                'content' => $request->content
-            ];
-        }
-        
         DB::beginTransaction();
         try {
             $existingNews = $this->newsRepositoryInterface->getById($id);
-            Storage::delete('public/news' . $existingNews->image);
-            $news = $this->newsRepositoryInterface->update($updateDetails, $id);
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $imageName = $image->hashName();
+                $image->storeAs('public/news/', $imageName);
+
+                if ($existingNews->image && Storage::exists('public/news/' . $existingNews->image)) {
+                    Storage::delete('public/news/' . $existingNews->image);
+                }
+
+                $updateDetails = [
+                    'title' => $request->title,
+                    'image' => $imageName,
+                    'content' => $request->content
+                ];
+            } else {
+                $updateDetails = [
+                    'title' => $request->title,
+                    'content' => $request->content
+                ];
+            }
+
+            $this->newsRepositoryInterface->update($updateDetails, $id);
             DB::commit();
-            return ApiResponseClass::sendResponse(new NewsResource($news), 'News Update Successful', 201);
+            return ApiResponseClass::sendResponse('News Update Successful', '', 200);
         } catch (\Exception $exc) {
-            Storage::delete('public/news' . $imageName);
+
+            if (isset($imageName)) {
+                Storage::delete('public/news/' . $imageName);
+            }
             return ApiResponseClass::rollback($exc);
         }
     }
@@ -94,8 +101,10 @@ class NewsController extends Controller
     public function destroy(string $id)
     {
         $existingNews = $this->newsRepositoryInterface->getById($id);
-        Storage::delete('public/news' . $existingNews->image);
-        $news = $this->newsRepositoryInterface->delete($id);
-        return ApiResponseClass::sendResponse(new NewsResource($news), 'News Delete Successful', 204);
+        if ($existingNews->image && Storage::exists('public/news/' . $existingNews->image)) {
+            Storage::delete('public/news/' . $existingNews->image);
+        }
+        $this->newsRepositoryInterface->delete($id);
+        return ApiResponseClass::sendResponse('News Delete Successful', '', 204);
     }
 }
