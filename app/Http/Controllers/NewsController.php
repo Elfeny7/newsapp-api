@@ -88,7 +88,7 @@ class NewsController extends Controller
 
             $this->newsRepositoryInterface->update($updateDetails, $id);
             DB::commit();
-            return ApiResponseClass::sendResponse('News Update Successful', '', 200);
+            return ApiResponseClass::sendResponse('News Update Successful', '', 201);
         } catch (\Exception $exc) {
 
             if (isset($imageName)) {
