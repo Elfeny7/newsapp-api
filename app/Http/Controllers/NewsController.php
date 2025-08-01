@@ -44,9 +44,9 @@ class NewsController extends Controller
             $news = $this->newsRepositoryInterface->store($details);
             DB::commit();
             return ApiResponseClass::sendResponse(new NewsResource($news), 'News Create Successful', 201);
-        } catch (\Exception $exc) {
+        } catch (\Exception $e) {
             Storage::disk('public')->delete('news/' . $imageName);
-            return ApiResponseClass::rollback($exc);
+            return ApiResponseClass::rollback($e);
         }
     }
 
@@ -88,12 +88,12 @@ class NewsController extends Controller
             $this->newsRepositoryInterface->update($updateDetails, $id);
             DB::commit();
             return ApiResponseClass::sendResponse('News Update Successful', '', 201);
-        } catch (\Exception $exc) {
+        } catch (\Exception $e) {
 
             if (isset($imageName)) {
                 Storage::disk('public')->delete('news/' . $imageName);
             }
-            return ApiResponseClass::rollback($exc);
+            return ApiResponseClass::rollback($e);
         }
     }
 
