@@ -53,7 +53,7 @@ class NewsController extends Controller
     public function show(string $id)
     {
         $news = $this->newsRepositoryInterface->getById($id);
-        return ApiResponseClass::sendResponse(new NewsResource($news), '', 200);
+        return ApiResponseClass::sendResponse(new NewsResource($news), 'News retrieved', 200);
     }
 
     public function edit(string $id) {}
@@ -87,7 +87,7 @@ class NewsController extends Controller
 
             $this->newsRepositoryInterface->update($updateDetails, $id);
             DB::commit();
-            return ApiResponseClass::sendResponse('News Update Successful', '', 201);
+            return ApiResponseClass::sendResponse('', 'News Update Successful', 201);
         } catch (\Exception $e) {
 
             if (isset($imageName)) {
@@ -104,6 +104,6 @@ class NewsController extends Controller
             Storage::disk('public')->delete('news/' . $existingNews->image);
         }
         $this->newsRepositoryInterface->delete($id);
-        return ApiResponseClass::sendResponse('News Delete Successful', '', 204);
+        return ApiResponseClass::sendResponse('', 'News Delete Successful', 204);
     }
 }
