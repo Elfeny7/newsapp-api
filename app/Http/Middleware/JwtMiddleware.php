@@ -3,17 +3,23 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use app\Classes\ApiResponseClass;
+use App\Classes\ApiResponseClass;
+use App\Interfaces\TokenServiceInterface;
 
 class JwtMiddleware
 {
+    private TokenServiceInterface $tokenServiceInterface;
+
+    public function __construct(TokenServiceInterface $tokenServiceInterface){
+        $this->tokenServiceInterface = $tokenServiceInterface;
+    }
+
     public function handle(Request $request, Closure $next): Response
     {
         try {
-            JWTAuth::parseToken()->authenticate();
+            $this->tokenServiceInterface->authenticate();
         } catch (\Exception $e) {
             return ApiResponseClass::throw($e, "Unauthorized", 401);
         }

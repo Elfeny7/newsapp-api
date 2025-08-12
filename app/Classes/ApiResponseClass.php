@@ -8,20 +8,30 @@ use Illuminate\Support\Facades\Log;
 
 class ApiResponseClass
 {
-     public static function rollback($e, $message = "Something went wrong! Process not completed")
+     public static function rollback($e, $message = "Internal server error", $code = 500)
      {
           if (DB::transactionLevel() > 0) {
                DB::rollBack();
           }
-          self::throw($e, $message);
+          self::throw($e, $message, $code);
      }
 
-     public static function throw($e, $message = "Something went wrong! Process not completed", $code = 500)
+     public static function throw($e, $message = "Internal server error", $code = 500)
      {
           Log::error($e->getMessage(), ['trace' => $e->getTraceAsString()]);
           $response = [
                'success' => false,
                'message' => $message,
+          ];
+          throw new HttpResponseException(response()->json($response, $code));
+     }
+
+     public static function validationError($errors, $message = "Validation error", $code = 422)
+     {
+          $response = [
+               'success' => false,
+               'message' => $message,
+               'data' => $errors
           ];
           throw new HttpResponseException(response()->json($response, $code));
      }

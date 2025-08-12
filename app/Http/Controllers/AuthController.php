@@ -2,65 +2,87 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RegisterUserRequest;
-use App\Interfaces\UserRepositoryInterface;
-use App\Classes\ApiResponseClass;
-use App\Services\AuthService;
-use App\Http\Resources\UserResource;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Classes\ApiResponseClass;
+use App\Interfaces\AuthServiceInterface;
+use App\Http\Requests\RegisterUserRequest;
+use App\Http\Requests\LoginUserRequest;
+use App\Http\Resources\UserResource;
+use App\Exceptions\InvalidCredentialsException;
+use App\Exceptions\UserNotFoundException;
 
 class AuthController extends Controller
 {
+    private AuthServiceInterface $authServiceInterface;
 
-    private AuthService $authService;
-
-    public function __construct(AuthService $authService)
+    public function __construct(AuthServiceInterface $authServiceInterface)
     {
-        $this->authService = $authService;
+        $this->authServiceInterface = $authServiceInterface;
     }
 
     public function register(RegisterUserRequest $request)
     {
-        $credentials = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ];
-
         DB::beginTransaction();
         try {
-            $data = $this->authService->register($credentials);
+            $data = $this->authServiceInterface->register($request->getRegisterPayload());
             $responseData = [
                 'user' => new UserResource($data['user']),
                 'token' => $data['token']
             ];
             DB::commit();
             return ApiResponseClass::sendResponse($responseData, 'Register Successful', 201);
-        }catch(JWTException $e){
+        } catch (JWTException $e) {
+            return ApiResponseClass::rollback($e, $e->getMessage() ?: 'Register Failed', 401);
+        } catch (\Exception $e) {
             return ApiResponseClass::rollback($e);
         }
     }
 
-    public function login()
+    public function login(LoginUserRequest $request)
     {
+        $credentials = $request->only('email', 'password');
 
+        try {
+            $data = $this->authServiceInterface->login($credentials);
+            $responseData = [
+                'user' => new UserResource($data['user']),
+                'token' => $data['token'],
+                'expires_in' => $data['expires_in']
+            ];
+            return ApiResponseClass::sendResponse($responseData, 'Login Successful', 200);
+        } catch (InvalidCredentialsException $e) {
+            return ApiResponseClass::throw($e, 'Invalid Credentials', 401);
+        } catch (JWTException $e) {
+            return ApiResponseClass::throw($e, $e->getMessage() ?: 'Login Failed', 401);
+        } catch (\Exception $e) {
+            return ApiResponseClass::throw($e);
+        }
     }
 
     public function logout()
     {
-
+        try {
+            $this->authServiceInterface->logout();
+            return ApiResponseClass::sendResponse('', 'Logout Successful', 200);
+        } catch (JWTException $e) {
+            return ApiResponseClass::throw($e, $e->getMessage() ?: 'Logout Failed', 401);
+        } catch (\Exception $e) {
+            return ApiResponseClass::throw($e);
+        }
     }
 
     public function getUser()
     {
-
-    }
-
-    public function updateUser()
-    {
-        
+        try {
+            $user = $this->authServiceInterface->getUser();
+            return ApiResponseClass::sendResponse($user, 'User Retrieved', 200);
+        } catch (UserNotFoundException $e) {
+            return ApiResponseClass::throw($e, 'User Not Found', 404);
+        } catch (JWTException $e) {
+            return ApiResponseClass::throw($e, $e->getMessage() ?: 'Failed to Retrieve User', 401);
+        } catch (\Exception $e) {
+            return ApiResponseClass::throw($e);
+        }
     }
 }
