@@ -184,7 +184,7 @@ class NewsApiTest extends TestCase
         $response->assertStatus(201)
             ->assertJson([
                 'success' => true,
-                'data' => 'News Update Successful',
+                'message' => 'News Update Successful',
             ]);
 
         $this->assertTrue(Storage::disk('public')->exists('news/' . $newImage->hashName()));
@@ -216,7 +216,7 @@ class NewsApiTest extends TestCase
         $response->assertStatus(201)
             ->assertJson([
                 'success' => true,
-                'data' => 'News Update Successful',
+                'message' => 'News Update Successful',
             ]);
 
         $this->assertDatabaseHas('news', [
