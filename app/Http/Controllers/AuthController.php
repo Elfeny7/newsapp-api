@@ -41,10 +41,8 @@ class AuthController extends Controller
 
     public function login(LoginUserRequest $request)
     {
-        $credentials = $request->only('email', 'password');
-
         try {
-            $data = $this->authServiceInterface->login($credentials);
+            $data = $this->authServiceInterface->login($request->getCredentials());
             $responseData = [
                 'user' => new UserResource($data['user']),
                 'token' => $data['token'],
@@ -75,7 +73,7 @@ class AuthController extends Controller
     public function getUser()
     {
         try {
-            $user = $this->authServiceInterface->getUser();
+            $user = new UserResource($this->authServiceInterface->getUser());
             return ApiResponseClass::sendResponse($user, 'User Retrieved', 200);
         } catch (UserNotFoundException $e) {
             return ApiResponseClass::throw($e, 'User Not Found', 404);

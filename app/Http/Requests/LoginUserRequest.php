@@ -23,10 +23,11 @@ class LoginUserRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-        return ApiResponseClass::validationError(
-            $validator->errors(),
-            'Validation errors',
-            422
-        );
+        return ApiResponseClass::validationError($validator->errors(), 'Validation errors', 422);
+    }
+
+    public function getCredentials(): array
+    {
+        return $this->only('email', 'password');
     }
 }
