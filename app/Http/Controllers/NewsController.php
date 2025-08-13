@@ -20,8 +20,12 @@ class NewsController extends Controller
 
     public function index()
     {
-        $data = $this->newsServiceInterface->index();
-        return ApiResponseClass::sendResponse(NewsResource::collection($data), '', 200);
+        try {
+            $data = $this->newsServiceInterface->index();
+            return ApiResponseClass::sendResponse(NewsResource::collection($data), '', 200);
+        } catch (\Exception $e) {
+            return ApiResponseClass::throw($e);
+        }
     }
 
     // public function create() {}
@@ -32,14 +36,18 @@ class NewsController extends Controller
             $news = $this->newsServiceInterface->createNews($request->getStoreNewsPayload());
             return ApiResponseClass::sendResponse(new NewsResource($news), 'News Create Successful', 201);
         } catch (\Exception $e) {
-            return ApiResponseClass::rollback($e);
+            return ApiResponseClass::throw($e);
         }
     }
 
     public function show(string $id)
     {
-        $news = $this->newsServiceInterface->getById($id);
-        return ApiResponseClass::sendResponse(new NewsResource($news), 'News retrieved', 200);
+        try {
+            $news = $this->newsServiceInterface->getById($id);
+            return ApiResponseClass::sendResponse(new NewsResource($news), 'News retrieved', 200);
+        } catch (\Exception $e) {
+            return ApiResponseClass::throw($e);
+        }
     }
 
     // public function edit(string $id) {}
@@ -50,13 +58,17 @@ class NewsController extends Controller
             $this->newsServiceInterface->updateNews($request->getUpdateNewsPayload(), $id);
             return ApiResponseClass::sendResponse('', 'News Update Successful', 201);
         } catch (\Exception $e) {
-            return ApiResponseClass::rollback($e);
+            return ApiResponseClass::throw($e);
         }
     }
 
     public function destroy(string $id)
     {
-       $this->newsServiceInterface->deleteNews($id);
-        return ApiResponseClass::sendResponse('', 'News Delete Successful', 204);
+        try {
+            $this->newsServiceInterface->deleteNews($id);
+            return ApiResponseClass::sendResponse('', 'News Delete Successful', 204);
+        } catch (\Exception $e) {
+            return ApiResponseClass::throw($e);
+        }
     }
 }

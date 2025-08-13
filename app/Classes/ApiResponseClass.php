@@ -8,14 +8,6 @@ use Illuminate\Support\Facades\Log;
 
 class ApiResponseClass
 {
-     public static function rollback($e, $message = "Internal server error", $code = 500)
-     {
-          if (DB::transactionLevel() > 0) {
-               DB::rollBack();
-          }
-          self::throw($e, $message, $code);
-     }
-
      public static function throw($e, $message = "Internal server error", $code = 500)
      {
           Log::error($e->getMessage(), ['trace' => $e->getTraceAsString()]);

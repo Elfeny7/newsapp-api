@@ -23,19 +23,17 @@ class AuthController extends Controller
 
     public function register(RegisterUserRequest $request)
     {
-        DB::beginTransaction();
         try {
             $data = $this->authServiceInterface->register($request->getRegisterPayload());
             $responseData = [
                 'user' => new UserResource($data['user']),
                 'token' => $data['token']
             ];
-            DB::commit();
             return ApiResponseClass::sendResponse($responseData, 'Register Successful', 201);
         } catch (JWTException $e) {
-            return ApiResponseClass::rollback($e, $e->getMessage() ?: 'Register Failed', 401);
+            return ApiResponseClass::throw($e, $e->getMessage() ?: 'Register Failed', 401);
         } catch (\Exception $e) {
-            return ApiResponseClass::rollback($e);
+            return ApiResponseClass::throw($e);
         }
     }
 

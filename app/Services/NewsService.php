@@ -19,8 +19,7 @@ class NewsService implements NewsServiceInterface
 
     public function index()
     {
-        $data = $this->newsRepositoryInterface->index();
-        return $data;
+        return $this->newsRepositoryInterface->index();
     }
 
     public function createNews(array $payload)
@@ -44,19 +43,20 @@ class NewsService implements NewsServiceInterface
             if (!empty($imageName) && Storage::disk('public')->exists('news/' . $imageName)) {
                 Storage::disk('public')->delete('news/' . $imageName);
             }
+            DB::rollBack();
             throw $e;
         }
     }
 
     public function getById(string $id)
     {
-        $news = $this->newsRepositoryInterface->getById($id);
-        return $news;
+        return $this->newsRepositoryInterface->getById($id);
     }
 
     public function updateNews(array $payload, string $id)
     {
         DB::beginTransaction();
+
         try {
             $existingNews = $this->newsRepositoryInterface->getById($id);
 
@@ -82,10 +82,13 @@ class NewsService implements NewsServiceInterface
 
             $this->newsRepositoryInterface->update($updateDetails, $id);
             DB::commit();
+
         } catch (\Exception $e) {
+
             if (!empty($imageName) && Storage::disk('public')->exists('news/' . $imageName)) {
                 Storage::disk('public')->delete('news/' . $imageName);
             }
+            DB::rollBack();
             throw $e;
         }
     }
@@ -93,9 +96,12 @@ class NewsService implements NewsServiceInterface
     public function deleteNews(string $id)
     {
         $existingNews = $this->getById($id);
+        DB::transaction(function () use ($id) {
+            $this->newsRepositoryInterface->delete($id);
+        });
+
         if ($existingNews->image && Storage::disk('public')->exists('news/' . $existingNews->image)) {
             Storage::disk('public')->delete('news/' . $existingNews->image);
         }
-        $this->newsRepositoryInterface->delete($id);
     }
 }
