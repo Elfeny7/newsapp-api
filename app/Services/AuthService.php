@@ -22,7 +22,7 @@ class AuthService implements AuthServiceInterface
 
     public function register($payload)
     {
-        DB::transaction(function () use ($payload) {
+        return DB::transaction(function () use ($payload) {
             $user = $this->userRepositoryInterface->createUser($payload);
             $token = $this->tokenServiceInterface->generate($user);
             return compact('user', 'token');
