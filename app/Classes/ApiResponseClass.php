@@ -23,7 +23,7 @@ class ApiResponseClass
           $response = [
                'success' => false,
                'message' => $message,
-               'data' => $errors
+               'error' => $errors
           ];
           throw new HttpResponseException(response()->json($response, $code));
      }
