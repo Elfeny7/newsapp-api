@@ -24,9 +24,16 @@ class AuthService implements AuthServiceInterface
     public function register($payload)
     {
         return DB::transaction(function () use ($payload) {
-            $user = $this->userRepositoryInterface->createUser($payload);
-            $token = $this->tokenServiceInterface->generate($user);
-            return compact('user', 'token');
+            try {
+                $user = $this->userRepositoryInterface->createUser($payload);
+                $token = $this->tokenServiceInterface->generate($user);
+                AuthLogger::registerSuccess($user);
+
+                return compact('user', 'token');
+            } catch (\Exception $e) {
+                AuthLogger::registerFailed($payload['email'], $e->getMessage());
+                throw $e;
+            }
         });
     }
 
@@ -50,7 +57,13 @@ class AuthService implements AuthServiceInterface
 
     public function logout()
     {
-        $this->tokenServiceInterface->invalidate();
+        try {
+            $this->tokenServiceInterface->invalidate();
+            AuthLogger::logoutSuccess($this->getUser());
+        } catch (\Exception $e) {
+            AuthLogger::logoutFailed($this->getUser(), $e->getMessage());
+            throw $e;
+        }
     }
 
     public function getUser()
