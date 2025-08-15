@@ -8,6 +8,7 @@ use App\Interfaces\AuthServiceInterface;
 use App\Interfaces\TokenServiceInterface;
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\UserNotFoundException;
+use App\Logging\AuthLogger;
 
 class AuthService implements AuthServiceInterface
 {
@@ -33,11 +34,15 @@ class AuthService implements AuthServiceInterface
     {
         $token = $this->tokenServiceInterface->attempt($credentials);
         if (!$token) {
+            AuthLogger::loginFailed($credentials['email']);
             throw new InvalidCredentialsException();
         }
 
+        $user = $this->getUser();
+        AuthLogger::loginSuccess($user);
+
         return [
-            'user' => $this->getUser(),
+            'user' => $user,
             'token' => $token,
             'expires_in' => $this->tokenServiceInterface->getTTL(),
         ];
