@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Interfaces\NewsServiceInterface;
 use App\Interfaces\NewsRepositoryInterface;
+use App\Interfaces\AuthServiceInterface;
+use App\Logging\NewsLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,10 +13,12 @@ use Illuminate\Support\Facades\Storage;
 class NewsService implements NewsServiceInterface
 {
     private NewsRepositoryInterface $newsRepositoryInterface;
+    private AuthServiceInterface $authServiceInterface;
 
-    public function __construct(NewsRepositoryInterface $newsRepositoryInterface)
+    public function __construct(NewsRepositoryInterface $newsRepositoryInterface, AuthServiceInterface $authServiceInterface)
     {
         $this->newsRepositoryInterface = $newsRepositoryInterface;
+        $this->authServiceInterface = $authServiceInterface;
     }
 
     public function index()
@@ -38,12 +42,16 @@ class NewsService implements NewsServiceInterface
             $news = $this->newsRepositoryInterface->store($details);
 
             DB::commit();
+            $user = $this->authServiceInterface->getUser();
+            NewsLogger::created($news, $user);
+
             return $news;
         } catch (\Exception $e) {
             if (!empty($imageName) && Storage::disk('public')->exists('news/' . $imageName)) {
                 Storage::disk('public')->delete('news/' . $imageName);
             }
             DB::rollBack();
+            // NewsLogger::createFailed($payload, $this->authServiceInterface->getUser(), $e);
             throw $e;
         }
     }
@@ -81,14 +89,17 @@ class NewsService implements NewsServiceInterface
             }
 
             $this->newsRepositoryInterface->update($updateDetails, $id);
-            DB::commit();
 
+            DB::commit();
+            NewsLogger::updated($updateDetails, $existingNews, $this->authServiceInterface->getUser());
         } catch (\Exception $e) {
 
             if (!empty($imageName) && Storage::disk('public')->exists('news/' . $imageName)) {
                 Storage::disk('public')->delete('news/' . $imageName);
             }
+
             DB::rollBack();
+            NewsLogger::updateFailed($existingNews, $payload, $this->authServiceInterface->getUser(), $e);
             throw $e;
         }
     }
@@ -96,12 +107,20 @@ class NewsService implements NewsServiceInterface
     public function deleteNews(string $id)
     {
         $existingNews = $this->getById($id);
-        DB::transaction(function () use ($id) {
-            $this->newsRepositoryInterface->delete($id);
-        });
+        try {
+            DB::transaction(function () use ($id) {
+                $this->newsRepositoryInterface->delete($id);
+            });
 
-        if ($existingNews->image && Storage::disk('public')->exists('news/' . $existingNews->image)) {
-            Storage::disk('public')->delete('news/' . $existingNews->image);
+            if ($existingNews->image && Storage::disk('public')->exists('news/' . $existingNews->image)) {
+                Storage::disk('public')->delete('news/' . $existingNews->image);
+            }
+
+            NewsLogger::deleted($existingNews, $this->authServiceInterface->getUser());
+
+        } catch (\Exception $e) {
+            NewsLogger::deleteFailed($existingNews, $this->authServiceInterface->getUser(), $e);
+            throw $e; 
         }
     }
 }
