@@ -22,7 +22,7 @@ class NewsController extends Controller
     {
         try {
             $data = $this->newsServiceInterface->index();
-            return ApiResponseClass::sendResponse(NewsResource::collection($data), '', 200);
+            return ApiResponseClass::sendResponse(NewsResource::collection($data), 'News data retrieved', 200);
         } catch (\Exception $e) {
             return ApiResponseClass::throw($e);
         }

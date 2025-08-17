@@ -42,16 +42,16 @@ class NewsService implements NewsServiceInterface
             $news = $this->newsRepositoryInterface->store($details);
 
             DB::commit();
-            $user = $this->authServiceInterface->getUser();
-            NewsLogger::created($news, $user);
+            NewsLogger::created($news, $this->authServiceInterface->getUser());
 
             return $news;
         } catch (\Exception $e) {
             if (!empty($imageName) && Storage::disk('public')->exists('news/' . $imageName)) {
                 Storage::disk('public')->delete('news/' . $imageName);
             }
+
             DB::rollBack();
-            // NewsLogger::createFailed($payload, $this->authServiceInterface->getUser(), $e);
+            NewsLogger::createFailed($payload, $this->authServiceInterface->getUser(), $e);
             throw $e;
         }
     }
@@ -89,8 +89,8 @@ class NewsService implements NewsServiceInterface
             }
 
             $this->newsRepositoryInterface->update($updateDetails, $id);
-
             DB::commit();
+
             NewsLogger::updated($updateDetails, $existingNews, $this->authServiceInterface->getUser());
         } catch (\Exception $e) {
 
@@ -99,7 +99,7 @@ class NewsService implements NewsServiceInterface
             }
 
             DB::rollBack();
-            NewsLogger::updateFailed($existingNews, $payload, $this->authServiceInterface->getUser(), $e);
+            NewsLogger::updateFailed($payload, $existingNews, $this->authServiceInterface->getUser(), $e);
             throw $e;
         }
     }

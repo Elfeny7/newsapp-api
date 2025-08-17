@@ -17,15 +17,14 @@ class NewsLogger
         ]);
     }
 
-    public static function updated($news, $oldNews, $user)
+    public static function updated($payload, $existingNews, $user)
     {
         Log::channel('news')->info('News updated', [
-            'news_id'  => $news->id,
-            'title'    => $news->title,
+            'title'    => $payload['title'],
             'user_id'  => $user->id,
             'email'    => $user->email ?? null,
-            'old_data' => $oldNews,
-            'new_data' => $news,
+            'old_data' => $existingNews,
+            'new_data' => $payload,
             'time'     => now()->toDateTimeString(),
         ]);
     }
@@ -54,11 +53,11 @@ class NewsLogger
         ]);
     }
 
-    public static function updateFailed($oldNews, $payload, $user, \Exception $e)
+    public static function updateFailed($payload, $existingNews, $user, \Exception $e)
     {
         Log::channel('news')->error('News update failed', [
-            'news_id' => $oldNews->id ?? null,
-            'title'   => $oldNews->title ?? $payload['title'] ?? null,
+            'news_id' => $existingNews->id ?? null,
+            'title'   => $existingNews->title ?? $payload['title'] ?? null,
             'user_id' => $user->id ?? null,
             'email'   => $user->email ?? null,
             'payload' => $payload,
