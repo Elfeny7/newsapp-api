@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use App\Classes\ApiResponseClass;
+use App\Support\ApiResponse;
 use App\Interfaces\AuthServiceInterface;
-use App\Http\Requests\RegisterUserRequest;
-use App\Http\Requests\LoginUserRequest;
+use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Http\Requests\Auth\LoginUserRequest;
 use App\Http\Resources\UserResource;
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\UserNotFoundException;
@@ -29,11 +28,11 @@ class AuthController extends Controller
                 'user' => new UserResource($data['user']),
                 'token' => $data['token']
             ];
-            return ApiResponseClass::sendResponse($responseData, 'Register Successful', 201);
+            return ApiResponse::success($responseData, 'Register Successful', 201);
         } catch (JWTException $e) {
-            return ApiResponseClass::throw($e, $e->getMessage() ?: 'Register Failed', 401);
+            return ApiResponse::throw($e, $e->getMessage() ?: 'Register Failed', 401);
         } catch (\Exception $e) {
-            return ApiResponseClass::throw($e);
+            return ApiResponse::throw($e);
         }
     }
 
@@ -46,13 +45,13 @@ class AuthController extends Controller
                 'token' => $data['token'],
                 'expires_in' => $data['expires_in']
             ];
-            return ApiResponseClass::sendResponse($responseData, 'Login Successful', 200);
+            return ApiResponse::success($responseData, 'Login Successful', 200);
         } catch (InvalidCredentialsException $e) {
-            return ApiResponseClass::throw($e, 'Invalid Credentials', 401);
+            return ApiResponse::throw($e, 'Invalid Credentials', 401);
         } catch (JWTException $e) {
-            return ApiResponseClass::throw($e, $e->getMessage() ?: 'Login Failed', 401);
+            return ApiResponse::throw($e, $e->getMessage() ?: 'Login Failed', 401);
         } catch (\Exception $e) {
-            return ApiResponseClass::throw($e);
+            return ApiResponse::throw($e);
         }
     }
 
@@ -60,11 +59,11 @@ class AuthController extends Controller
     {
         try {
             $this->authServiceInterface->logout();
-            return ApiResponseClass::sendResponse('', 'Logout Successful', 200);
+            return ApiResponse::success('', 'Logout Successful', 200);
         } catch (JWTException $e) {
-            return ApiResponseClass::throw($e, $e->getMessage() ?: 'Logout Failed', 401);
+            return ApiResponse::throw($e, $e->getMessage() ?: 'Logout Failed', 401);
         } catch (\Exception $e) {
-            return ApiResponseClass::throw($e);
+            return ApiResponse::throw($e);
         }
     }
 
@@ -72,13 +71,13 @@ class AuthController extends Controller
     {
         try {
             $user = new UserResource($this->authServiceInterface->getUser());
-            return ApiResponseClass::sendResponse($user, 'User Retrieved', 200);
+            return ApiResponse::success($user, 'User Retrieved', 200);
         } catch (UserNotFoundException $e) {
-            return ApiResponseClass::throw($e, 'User Not Found', 404);
+            return ApiResponse::throw($e, 'User Not Found', 404);
         } catch (JWTException $e) {
-            return ApiResponseClass::throw($e, $e->getMessage() ?: 'Failed to Retrieve User', 401);
+            return ApiResponse::throw($e, $e->getMessage() ?: 'Failed to Retrieve User', 401);
         } catch (\Exception $e) {
-            return ApiResponseClass::throw($e);
+            return ApiResponse::throw($e);
         }
     }
 }

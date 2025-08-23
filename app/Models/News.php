@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class News extends Model
 {
     use HasFactory;
-    protected $fillable = ['image', 'title', 'content'];
+    protected $fillable = ['title', 'slug', 'image', 'excerpt', 'content', 'views', 'status', 'published_at', 'category_id'];
 }

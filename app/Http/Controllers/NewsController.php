@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreNewsRequest;
-use App\Http\Requests\UpdateNewsRequest;
+use App\Http\Requests\News\StoreNewsRequest;
+use App\Http\Requests\News\UpdateNewsRequest;
 use App\Interfaces\NewsServiceInterface;
-use App\Classes\ApiResponseClass;
 use App\Http\Resources\NewsResource;
+use App\Support\ApiResponse;
 
 class NewsController extends Controller
 {
@@ -22,9 +22,9 @@ class NewsController extends Controller
     {
         try {
             $data = $this->newsServiceInterface->index();
-            return ApiResponseClass::sendResponse(NewsResource::collection($data), 'News data retrieved', 200);
+            return ApiResponse::success(NewsResource::collection($data), 'News data retrieved', 200);
         } catch (\Exception $e) {
-            return ApiResponseClass::throw($e);
+            return ApiResponse::throw($e);
         }
     }
 
@@ -34,9 +34,9 @@ class NewsController extends Controller
     {
         try {
             $news = $this->newsServiceInterface->createNews($request->getStoreNewsPayload());
-            return ApiResponseClass::sendResponse(new NewsResource($news), 'News Create Successful', 201);
+            return ApiResponse::success(new NewsResource($news), 'News Create successsful', 201);
         } catch (\Exception $e) {
-            return ApiResponseClass::throw($e);
+            return ApiResponse::throw($e);
         }
     }
 
@@ -44,9 +44,9 @@ class NewsController extends Controller
     {
         try {
             $news = $this->newsServiceInterface->getById($id);
-            return ApiResponseClass::sendResponse(new NewsResource($news), 'News retrieved', 200);
+            return ApiResponse::success(new NewsResource($news), 'News retrieved', 200);
         } catch (\Exception $e) {
-            return ApiResponseClass::throw($e);
+            return ApiResponse::throw($e);
         }
     }
 
@@ -56,9 +56,9 @@ class NewsController extends Controller
     {
         try {
             $this->newsServiceInterface->updateNews($request->getUpdateNewsPayload(), $id);
-            return ApiResponseClass::sendResponse('', 'News Update Successful', 201);
+            return ApiResponse::success('', 'News Update successsful', 201);
         } catch (\Exception $e) {
-            return ApiResponseClass::throw($e);
+            return ApiResponse::throw($e);
         }
     }
 
@@ -66,9 +66,9 @@ class NewsController extends Controller
     {
         try {
             $this->newsServiceInterface->deleteNews($id);
-            return ApiResponseClass::sendResponse('', 'News Delete Successful', 204);
+            return ApiResponse::success('', 'News Delete successsful', 204);
         } catch (\Exception $e) {
-            return ApiResponseClass::throw($e);
+            return ApiResponse::throw($e);
         }
     }
 }

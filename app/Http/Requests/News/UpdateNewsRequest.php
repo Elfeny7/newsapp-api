@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\News;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
-use App\Classes\ApiResponseClass;
+use App\Support\ApiResponse;
 
-class StoreNewsRequest extends FormRequest
+class UpdateNewsRequest extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
@@ -17,7 +16,6 @@ class StoreNewsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'title' => 'required',
             'content' => 'required'
         ];
@@ -25,15 +23,15 @@ class StoreNewsRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-        return ApiResponseClass::validationError($validator->errors(), 'Validation errors', 422);
+        return ApiResponse::validationError($validator->errors(), 'Validation errors', 422);
     }
 
-    public function getStoreNewsPayload(): array
+    public function getUpdateNewsPayload(): array
     {
         return [
-            'image' => $this->file('image'),
             'title' => $this->input('title'),
-            'content' => $this->input('content')
+            'content' => $this->input('content'),
+            'image' => $this->file('image')
         ];
     }
 }
