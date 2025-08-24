@@ -28,8 +28,6 @@ class NewsController extends Controller
         }
     }
 
-    // public function create() {}
-
     public function store(StoreNewsRequest $request)
     {
         try {
@@ -49,8 +47,6 @@ class NewsController extends Controller
             return ApiResponse::throw($e);
         }
     }
-
-    // public function edit(string $id) {}
 
     public function update(UpdateNewsRequest $request, string $id)
     {

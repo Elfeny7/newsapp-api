@@ -20,7 +20,7 @@ class NewsLogger
     public static function updated($payload, $existingNews, $user)
     {
         Log::channel('news')->info('News updated', [
-            'title'    => $payload['title'],
+            'title'    => $payload['title'] ?? null,
             'user_id'  => $user->id,
             'email'    => $user->email ?? null,
             'old_data' => $existingNews,

@@ -2,8 +2,6 @@
 
 namespace App\Interfaces;
 
-use Illuminate\Http\UploadedFile;
-
 interface NewsServiceInterface
 {
     public function index();

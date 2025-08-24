@@ -139,6 +139,12 @@ return [
             'level' => 'info',
         ],
 
+        'category' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/category.log'),
+            'level' => 'info',
+        ],
+
     ],
 
 ];
