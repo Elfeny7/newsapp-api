@@ -5,7 +5,7 @@ use App\Models\Category;
 use App\Interfaces\CategoryRepositoryInterface;
 
 
-class NewsRepository implements CategoryRepositoryInterface
+class CategoryRepository implements CategoryRepositoryInterface
 {
     public function index()
     {

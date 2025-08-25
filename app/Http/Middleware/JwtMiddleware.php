@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Classes\ApiResponseClass;
+use App\Support\ApiResponse;
 use App\Interfaces\TokenServiceInterface;
 
 class JwtMiddleware
@@ -21,7 +21,7 @@ class JwtMiddleware
         try {
             $this->tokenServiceInterface->authenticate();
         } catch (\Exception $e) {
-            return ApiResponseClass::throw($e, "Unauthorized", 401);
+            return ApiResponse::throw($e, "Unauthorized", 401);
         }
         return $next($request);
     }
