@@ -41,6 +41,7 @@ class NewsService implements NewsServiceInterface
                 'excerpt' => $payload['excerpt'],
                 'content' => $payload['content'],
                 'status'  => $payload['status'],
+                'published_at' => $payload['published_at'],
                 'views'   => 0,
                 'image'   => $imageName,
             ];
