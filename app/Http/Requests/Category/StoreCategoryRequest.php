@@ -16,11 +16,11 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
-            'slug' => 'required',
-            'description' => 'required',
-            'parent_id' => 'nullable',
-            'status' => 'required',
+            'name'        => 'required|string|max:255',
+            'slug'        => 'nullable|unique:categories,slug',
+            'description' => 'required|string',
+            'parent_id'   => 'required|exists:categories,id',
+            'status'      => 'required|in:active,inactive',
         ];
     }
 
@@ -32,11 +32,11 @@ class StoreCategoryRequest extends FormRequest
     public function getStoreCategoryPayload(): array
     {
         return [
-            'name' => $this->input('name'),
-            'slug' => $this->input('slug'),
+            'name'        => $this->input('name'),
+            'slug'        => $this->input('slug'),
             'description' => $this->input('description'),
-            'parent_id' => $this->input('parent_id'),
-            'status' => $this->input('status'),
+            'parent_id'   => $this->input('parent_id'),
+            'status'      => $this->input('status'),
         ];
     }
 }

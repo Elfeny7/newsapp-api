@@ -16,9 +16,13 @@ class UpdateNewsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required',
-            'content' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image'        => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'title'        => 'required|string|max:255',
+            'slug'         => 'nullable|unique:news,slug',
+            'excerpt'      => 'required|string|max:500',
+            'content'      => 'required|string',
+            'category_id'  => 'required|exists:categories,id',
+            'status'       => 'required|in:draft,published',
         ];
     }
 
@@ -30,9 +34,14 @@ class UpdateNewsRequest extends FormRequest
     public function getUpdateNewsPayload(): array
     {
         return [
-            'title' => $this->input('title'),
-            'content' => $this->input('content'),
-            'image' => $this->file('image')
+            'image'        => $this->file('image'),
+            'title'        => $this->input('title'),
+            'slug'         => $this->input('slug'),
+            'excerpt'      => $this->input('excerpt'),
+            'content'      => $this->input('content'),
+            'category_id'  => $this->input('category_id'),
+            'status'       => $this->input('status'),
+            'published_at' => $this->input('status') === 'published' ? now() : null,
         ];
     }
 }

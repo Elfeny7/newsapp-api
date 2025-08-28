@@ -36,8 +36,13 @@ class NewsService implements NewsServiceInterface
 
             $details = [
                 'title'   => $payload['title'],
+                'category_id' => $payload['category_id'],
+                'slug'   => $payload['slug'],
+                'excerpt' => $payload['excerpt'],
                 'content' => $payload['content'],
-                'image'   => $imageName
+                'status'  => $payload['status'],
+                'views'   => 0,
+                'image'   => $imageName,
             ];
             $news = $this->newsRepositoryInterface->store($details);
 
@@ -72,26 +77,36 @@ class NewsService implements NewsServiceInterface
                 $imageName = $payload['image']->hashName();
                 Storage::disk('public')->putFileAs('news', $payload['image'], $imageName);
 
-                if ($existingNews->image && Storage::disk('public')->exists('news/' . $existingNews->image)) {
-                    Storage::disk('public')->delete('news/' . $existingNews->image);
-                }
-
+                
                 $updateDetails = [
                     'title'   => $payload['title'] ?? $existingNews->title,
                     'image'   => $imageName,
-                    'content' => $payload['content'] ?? $existingNews->content
+                    'slug'    => $payload['slug'] ?? $existingNews->slug,
+                    'excerpt' => $payload['excerpt'] ?? $existingNews->excerpt,
+                    'content' => $payload['content'] ?? $existingNews->content,
+                    'status'  => $payload['status'] ?? $existingNews->status,
+                    'category_id' => $payload['category_id'] ?? $existingNews->category_id,
                 ];
             } else {
                 $updateDetails = [
                     'title'   => $payload['title'] ?? $existingNews->title,
-                    'content' => $payload['content'] ?? $existingNews->content
+                    'slug'    => $payload['slug'] ?? $existingNews->slug,
+                    'excerpt' => $payload['excerpt'] ?? $existingNews->excerpt,
+                    'content' => $payload['content'] ?? $existingNews->content,
+                    'status'  => $payload['status'] ?? $existingNews->status,
+                    'category_id' => $payload['category_id'] ?? $existingNews->category_id,
                 ];
             }
-
+            
             $this->newsRepositoryInterface->update($updateDetails, $id);
             DB::commit();
 
+            if ($existingNews->image && Storage::disk('public')->exists('news/' . $existingNews->image)) {
+                Storage::disk('public')->delete('news/' . $existingNews->image);
+            }
+
             NewsLogger::updated($updateDetails, $existingNews, $this->authServiceInterface->getUser());
+            
         } catch (\Exception $e) {
 
             if (!empty($imageName) && Storage::disk('public')->exists('news/' . $imageName)) {
