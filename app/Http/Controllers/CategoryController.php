@@ -21,7 +21,7 @@ class CategoryController extends Controller
     {
         try {
             $data = $this->categoryServiceInterface->index();
-            return ApiResponse::success(CategoryResource::collection($data), 'News data retrieved', 200);
+            return ApiResponse::success(CategoryResource::collection($data), 'Category data retrieved', 200);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }
