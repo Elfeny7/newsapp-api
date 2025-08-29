@@ -19,7 +19,7 @@ class StoreCategoryRequest extends FormRequest
             'name'        => 'required|string|max:255',
             'slug'        => 'nullable|unique:categories,slug',
             'description' => 'required|string',
-            'parent_id'   => 'required|exists:categories,id',
+            'parent_id'   => 'nullable|exists:categories,id',
             'status'      => 'required|in:active,inactive',
         ];
     }
