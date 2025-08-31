@@ -78,7 +78,6 @@ class NewsService implements NewsServiceInterface
                 $imageName = $payload['image']->hashName();
                 Storage::disk('public')->putFileAs('news', $payload['image'], $imageName);
 
-                
                 $updateDetails = [
                     'title'   => $payload['title'] ?? $existingNews->title,
                     'image'   => $imageName,
@@ -86,6 +85,9 @@ class NewsService implements NewsServiceInterface
                     'excerpt' => $payload['excerpt'] ?? $existingNews->excerpt,
                     'content' => $payload['content'] ?? $existingNews->content,
                     'status'  => $payload['status'] ?? $existingNews->status,
+                    'published_at' => array_key_exists('published_at', $payload)
+                        ? $payload['published_at']
+                        : $existingNews->published_at,
                     'category_id' => $payload['category_id'] ?? $existingNews->category_id,
                 ];
             } else {
@@ -95,10 +97,13 @@ class NewsService implements NewsServiceInterface
                     'excerpt' => $payload['excerpt'] ?? $existingNews->excerpt,
                     'content' => $payload['content'] ?? $existingNews->content,
                     'status'  => $payload['status'] ?? $existingNews->status,
+                    'published_at' => array_key_exists('published_at', $payload)
+                        ? $payload['published_at']
+                        : $existingNews->published_at,
                     'category_id' => $payload['category_id'] ?? $existingNews->category_id,
                 ];
             }
-            
+
             $this->newsRepositoryInterface->update($updateDetails, $id);
             DB::commit();
 
@@ -107,7 +112,6 @@ class NewsService implements NewsServiceInterface
             }
 
             NewsLogger::updated($updateDetails, $existingNews, $this->authServiceInterface->getUser());
-            
         } catch (\Exception $e) {
 
             if (!empty($imageName) && Storage::disk('public')->exists('news/' . $imageName)) {
@@ -133,10 +137,9 @@ class NewsService implements NewsServiceInterface
             }
 
             NewsLogger::deleted($existingNews, $this->authServiceInterface->getUser());
-
         } catch (\Exception $e) {
             NewsLogger::deleteFailed($existingNews, $this->authServiceInterface->getUser(), $e);
-            throw $e; 
+            throw $e;
         }
     }
 }
