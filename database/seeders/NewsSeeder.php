@@ -4,12 +4,19 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 use App\Models\News;
 
 class NewsSeeder extends Seeder
 {
     public function run(): void
     {
+        $defaultImage = 'dummy/default.jpg';
+        
+        if (Storage::disk('public')->exists($defaultImage)) {
+            Storage::disk('public')->copy($defaultImage, 'news/' . 'news1.jpg');
+        }
+        
         News::create([
             'title' => 'Exciting Soccer Match Ends in a Draw',
             'slug' => 'exciting-soccer-match-ends-in-a-draw',
