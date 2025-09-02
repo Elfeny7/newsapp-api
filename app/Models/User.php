@@ -23,6 +23,11 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
+    public function news()
+    {
+        return $this->hasMany(News::class, 'published_by');
+    }
+
     protected function casts(): array
     {
         return [

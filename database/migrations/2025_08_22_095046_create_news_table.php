@@ -15,6 +15,11 @@ return new class extends Migration
                 ->constrained('categories')
                 ->onDelete('cascade');
 
+            $table->foreignId('published_by')
+                ->nullable()
+                ->constrained('users')
+                ->onDelete('set null');
+
             $table->string('title')->unique();
             $table->string('slug')->unique();
             $table->string('image')->nullable();

@@ -42,6 +42,7 @@ class NewsService implements NewsServiceInterface
                 'content' => $payload['content'],
                 'status'  => $payload['status'],
                 'published_at' => $payload['published_at'],
+                'published_by' => $this->authServiceInterface->getUser()->id,
                 'views'   => 0,
                 'image'   => $imageName,
             ];
@@ -88,6 +89,7 @@ class NewsService implements NewsServiceInterface
                     'published_at' => array_key_exists('published_at', $payload)
                         ? $payload['published_at']
                         : $existingNews->published_at,
+                    'published_by' => $this->authServiceInterface->getUser()->id,
                     'category_id' => $payload['category_id'] ?? $existingNews->category_id,
                 ];
             } else {
@@ -100,6 +102,7 @@ class NewsService implements NewsServiceInterface
                     'published_at' => array_key_exists('published_at', $payload)
                         ? $payload['published_at']
                         : $existingNews->published_at,
+                    'published_by' => $this->authServiceInterface->getUser()->id,
                     'category_id' => $payload['category_id'] ?? $existingNews->category_id,
                 ];
             }
