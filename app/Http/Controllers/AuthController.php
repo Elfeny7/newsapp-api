@@ -20,6 +20,16 @@ class AuthController extends Controller
         $this->authServiceInterface = $authServiceInterface;
     }
 
+    public function index()
+    {
+        try {
+            $users = $this->authServiceInterface->getAllUsers();
+            return ApiResponse::success(UserResource::collection($users), 'Users Retrieved', 200);
+        } catch (\Exception $e) {
+            return ApiResponse::throw($e);
+        }
+    }
+
     public function register(RegisterUserRequest $request)
     {
         try {

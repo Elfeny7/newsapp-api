@@ -66,6 +66,16 @@ class AuthService implements AuthServiceInterface
         }
     }
 
+    public function getAllUsers()
+    {
+        return $this->userRepositoryInterface->getAllUsers();
+    }
+
+    public function getUserById($id)
+    {
+
+    }
+    
     public function getUser()
     {
         $user = $this->tokenServiceInterface->getUser();
@@ -73,5 +83,15 @@ class AuthService implements AuthServiceInterface
             throw new UserNotFoundException();
         }
         return $user;
+    }
+
+    public function updateUser($id, $payload)
+    {
+
+    }
+
+    public function deleteUser($id)
+    {
+
     }
 }
