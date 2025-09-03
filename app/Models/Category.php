@@ -10,6 +10,7 @@ class Category extends Model
 {
     use HasFactory, SoftDeletes;
     protected $fillable = ['name', 'slug', 'description', 'parent_id', 'status'];
+    protected $casts = ['parent_id' => 'integer'];
 
     public function news()
     {

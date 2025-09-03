@@ -10,6 +10,7 @@ class News extends Model
 {
     use HasFactory, SoftDeletes;
     protected $fillable = ['title', 'slug', 'image', 'excerpt', 'content', 'views', 'status', 'published_at', 'category_id', 'published_by'];
+    protected $casts = ['category_id' => 'integer', 'published_by' => 'integer'];
 
     public function categories()
     {

@@ -21,8 +21,8 @@ class UpdateNewsRequest extends FormRequest
             'slug'         => 'nullable|unique:news,slug',
             'excerpt'      => 'required|string|max:500',
             'content'      => 'required|string',
-            'category_id'  => 'required|exists:categories,id',
-            'status'       => 'required|in:draft,published',
+            'category_id'  => 'required|integer|exists:categories,id',
+            'status'       => 'required|string|in:draft,published',
         ];
     }
 
