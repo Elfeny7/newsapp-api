@@ -9,6 +9,7 @@ use App\Interfaces\TokenServiceInterface;
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\UserNotFoundException;
 use App\Logging\AuthLogger;
+use Illuminate\Container\Attributes\Auth;
 
 class AuthService implements AuthServiceInterface
 {
@@ -73,7 +74,7 @@ class AuthService implements AuthServiceInterface
 
     public function getUserById($id)
     {
-
+        return $this->userRepositoryInterface->getUserById($id);
     }
     
     public function getUser()
@@ -85,13 +86,36 @@ class AuthService implements AuthServiceInterface
         return $user;
     }
 
-    public function updateUser($id, $payload)
+    public function updateUser(array $payload, string $id)
     {
+        DB::beginTransaction();
+        try {
+            $existingUSer = $this->userRepositoryInterface->getUserById($id);
+            $updateDetails = [
+                'name'   => $payload['name'] ?? $existingUSer->name,
+                'email'  => $payload['email'] ?? $existingUSer->email,
+                'password'  => $payload['password'] ?? $existingUSer->password,
+            ];
+            $this->userRepositoryInterface->updateUser($updateDetails, $id);
 
+            DB::commit();
+            AuthLogger::updateSuccess($updateDetails, $existingUSer);
+        } catch (\Exception $e){
+
+            DB::rollBack();
+            AuthLogger::updateFailed($updateDetails, $existingUSer, $e);
+            throw $e;
+        }
     }
 
     public function deleteUser($id)
     {
-
+        try {
+            $this->userRepositoryInterface->deleteUser($id);
+            AuthLogger::deleteSuccess($id);
+        } catch (\Exception $e) {
+            AuthLogger::deleteFailed($id, $e);
+            throw $e;
+        }
     }
 }

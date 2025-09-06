@@ -7,6 +7,7 @@ use App\Support\ApiResponse;
 use App\Interfaces\AuthServiceInterface;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Requests\Auth\LoginUserRequest;
+use App\Http\Requests\Auth\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\UserNotFoundException;
@@ -25,6 +26,36 @@ class AuthController extends Controller
         try {
             $users = $this->authServiceInterface->getAllUsers();
             return ApiResponse::success(UserResource::collection($users), 'Users Retrieved', 200);
+        } catch (\Exception $e) {
+            return ApiResponse::throw($e);
+        }
+    }
+
+    public function show(string $id)
+    {
+        try {
+            $user = $this->authServiceInterface->getUserById($id);
+            return ApiResponse::success(new UserResource($user), 'User Retrieved', 200);
+        } catch (\Exception $e) {
+            return ApiResponse::throw($e);
+        }
+    }
+
+    public function update(UpdateUserRequest $request, string $id)
+    {
+        try {
+            $this->authServiceInterface->updateUser($request->getUpdatePayload(), $id);
+            return ApiResponse::success('', 'User Update successsful', 201);
+        } catch (\Exception $e) {
+            return ApiResponse::throw($e);
+        }
+    }
+
+    public function destroy(string $id)
+    {
+        try {
+            $this->authServiceInterface->deleteUser($id);
+            return ApiResponse::success('', 'User Delete successsful', 204);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }

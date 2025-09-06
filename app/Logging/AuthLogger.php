@@ -67,4 +67,44 @@ class AuthLogger
             'time' => now()->toDateTimeString()
         ]);
     }
+
+    public static function updateSuccess($payload, $existingUser)
+    {
+        Log::channel('auth')->info('User updated', [
+            'user_id' => $existingUser->id,
+            'email' => $existingUser->email,
+            'old_data' => $existingUser,
+            'new_data' => $payload,
+            'time' => now()->toDateTimeString()
+        ]);
+    }
+
+    public static function updateFailed($payload, $existingUser, $message)
+    {
+        Log::channel('auth')->warning('User update failed', [
+            'user_id' => $existingUser->id,
+            'email' => $existingUser->email,
+            'payload' => $payload,
+            'reason' => $message,
+            'time' => now()->toDateTimeString()
+        ]);
+    }
+
+    public static function deleteSuccess($id)
+    {
+        Log::channel('auth')->info('User deleted', [
+            'user_id' => $id,
+            'time' => now()->toDateTimeString()
+        ]);
+        
+    }
+
+    public static function deleteFailed($id, $message)
+    {
+        Log::channel('auth')->warning('User delete failed', [
+            'user_id' => $id,
+            'reason' => $message,
+            'time' => now()->toDateTimeString()
+        ]);
+    }
 }

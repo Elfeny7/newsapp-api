@@ -9,7 +9,7 @@ interface AuthServiceInterface
     public function logout();
     public function getUser();
     public function getAllUsers();
-    public function getUserById(int $id);
-    public function updateUser(int $id, array $payload);
-    public function deleteUser(int $id);
+    public function getUserById(string $id);
+    public function updateUser(array $payload, string $id);
+    public function deleteUser(string $id);
 }

@@ -15,5 +15,5 @@ Route::middleware('jwt')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/get-user', [AuthController::class, 'getUser']);
-    Route::apiResource('users', AuthController::class);
+    Route::apiResource('users', AuthController::class)->except(['store']);
 });
