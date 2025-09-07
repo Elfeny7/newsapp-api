@@ -21,9 +21,9 @@ class NewsService implements NewsServiceInterface
         $this->authServiceInterface = $authServiceInterface;
     }
 
-    public function index()
+    public function getAllNews()
     {
-        return $this->newsRepositoryInterface->index();
+        return $this->newsRepositoryInterface->getAllNews();
     }
 
     public function createNews(array $payload)
@@ -34,7 +34,7 @@ class NewsService implements NewsServiceInterface
             $imageName = $image->hashName();
             Storage::disk('public')->putFileAs('news', $image, $imageName);
 
-            $details = [
+            $newsDetails = [
                 'title'   => $payload['title'],
                 'category_id' => $payload['category_id'],
                 'slug'   => $payload['slug'],
@@ -42,14 +42,14 @@ class NewsService implements NewsServiceInterface
                 'content' => $payload['content'],
                 'status'  => $payload['status'],
                 'published_at' => $payload['published_at'],
-                'published_by' => $this->authServiceInterface->getUser()->id,
+                'published_by' => $this->authServiceInterface->getAuthenticatedUser()->id,
                 'views'   => 0,
                 'image'   => $imageName,
             ];
-            $news = $this->newsRepositoryInterface->store($details);
+            $news = $this->newsRepositoryInterface->createNews($newsDetails);
 
             DB::commit();
-            NewsLogger::created($news, $this->authServiceInterface->getUser());
+            NewsLogger::created($news, $this->authServiceInterface->getAuthenticatedUser());
 
             return $news;
         } catch (\Exception $e) {
@@ -58,22 +58,22 @@ class NewsService implements NewsServiceInterface
             }
 
             DB::rollBack();
-            NewsLogger::createFailed($payload, $this->authServiceInterface->getUser(), $e);
+            NewsLogger::createFailed($payload, $this->authServiceInterface->getAuthenticatedUser(), $e);
             throw $e;
         }
     }
 
-    public function getById(string $id)
+    public function getNewsById(int $id)
     {
-        return $this->newsRepositoryInterface->getById($id);
+        return $this->newsRepositoryInterface->getNewsById($id);
     }
 
-    public function updateNews(array $payload, string $id)
+    public function updateNews(array $payload, int $id)
     {
         DB::beginTransaction();
 
         try {
-            $existingNews = $this->newsRepositoryInterface->getById($id);
+            $existingNews = $this->newsRepositoryInterface->getNewsById($id);
 
             if (!empty($payload['image']) && $payload['image'] instanceof \Illuminate\Http\UploadedFile) {
                 $imageName = $payload['image']->hashName();
@@ -89,7 +89,7 @@ class NewsService implements NewsServiceInterface
                     'published_at' => array_key_exists('published_at', $payload)
                         ? $payload['published_at']
                         : $existingNews->published_at,
-                    'published_by' => $this->authServiceInterface->getUser()->id,
+                    'published_by' => $this->authServiceInterface->getAuthenticatedUser()->id,
                     'category_id' => $payload['category_id'] ?? $existingNews->category_id,
                 ];
             } else {
@@ -102,19 +102,19 @@ class NewsService implements NewsServiceInterface
                     'published_at' => array_key_exists('published_at', $payload)
                         ? $payload['published_at']
                         : $existingNews->published_at,
-                    'published_by' => $this->authServiceInterface->getUser()->id,
+                    'published_by' => $this->authServiceInterface->getAuthenticatedUser()->id,
                     'category_id' => $payload['category_id'] ?? $existingNews->category_id,
                 ];
             }
 
-            $this->newsRepositoryInterface->update($updateDetails, $id);
+            $this->newsRepositoryInterface->updateNews($updateDetails, $id);
             DB::commit();
 
             if ($existingNews->image && Storage::disk('public')->exists('news/' . $existingNews->image)) {
                 Storage::disk('public')->delete('news/' . $existingNews->image);
             }
 
-            NewsLogger::updated($updateDetails, $existingNews, $this->authServiceInterface->getUser());
+            NewsLogger::updated($updateDetails, $existingNews, $this->authServiceInterface->getAuthenticatedUser());
         } catch (\Exception $e) {
 
             if (!empty($imageName) && Storage::disk('public')->exists('news/' . $imageName)) {
@@ -122,26 +122,26 @@ class NewsService implements NewsServiceInterface
             }
 
             DB::rollBack();
-            NewsLogger::updateFailed($payload, $existingNews, $this->authServiceInterface->getUser(), $e);
+            NewsLogger::updateFailed($payload, $existingNews, $this->authServiceInterface->getAuthenticatedUser(), $e);
             throw $e;
         }
     }
 
-    public function deleteNews(string $id)
+    public function deleteNews(int $id)
     {
-        $existingNews = $this->getById($id);
+        $existingNews = $this->getNewsById($id);
         try {
             DB::transaction(function () use ($id) {
-                $this->newsRepositoryInterface->delete($id);
+                $this->newsRepositoryInterface->deleteNews($id);
             });
 
             if ($existingNews->image && Storage::disk('public')->exists('news/' . $existingNews->image)) {
                 Storage::disk('public')->delete('news/' . $existingNews->image);
             }
 
-            NewsLogger::deleted($existingNews, $this->authServiceInterface->getUser());
+            NewsLogger::deleted($existingNews, $this->authServiceInterface->getAuthenticatedUser());
         } catch (\Exception $e) {
-            NewsLogger::deleteFailed($existingNews, $this->authServiceInterface->getUser(), $e);
+            NewsLogger::deleteFailed($existingNews, $this->authServiceInterface->getAuthenticatedUser(), $e);
             throw $e;
         }
     }

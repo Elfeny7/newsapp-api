@@ -29,14 +29,14 @@ class CategoryService implements CategoryServiceInterface
     {
         DB::beginTransaction();
         try {
-            $details = [
+            $categoryDetails = [
                 'name'   => $payload['name'],
                 'slug'   => $payload['slug'],
                 'description'   => $payload['description'],
                 'parent_id' => $payload['parent_id'],
                 'status' => $payload['status'],
             ];
-            $category = $this->categoryRepositoryInterface->createCategory($details);
+            $category = $this->categoryRepositoryInterface->createCategory($categoryDetails);
 
             DB::commit();
             CategoryLogger::created($category, $this->authServiceInterface->getAuthenticatedUser());

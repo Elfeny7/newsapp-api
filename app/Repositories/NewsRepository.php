@@ -7,27 +7,27 @@ use App\Interfaces\NewsRepositoryInterface;
 
 class NewsRepository implements NewsRepositoryInterface
 {
-    public function index()
+    public function getAllNews()
     {
         return News::all();
     }
 
-    public function getById($id)
+    public function getNewsById(int $id)
     {
         return News::findOrFail($id);
     }
 
-    public function store(array $data)
+    public function createNews(array $newsDetails)
     {
-        return News::create($data);
+        return News::create($newsDetails);
     }
 
-    public function update(array $data, $id)
+    public function updateNews(array $newsDetails, int $id)
     {
-        return News::whereId($id)->update($data);
+        return News::whereId($id)->update($newsDetails);
     }
 
-    public function delete($id)
+    public function deleteNews(int $id)
     {
         News::destroy($id);
     }

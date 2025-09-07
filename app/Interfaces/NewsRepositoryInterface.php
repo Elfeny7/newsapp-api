@@ -4,9 +4,9 @@ namespace App\Interfaces;
 
 interface NewsRepositoryInterface
 {
-    public function index();
-    public function getById($id);
-    public function store(array $data);
-    public function update(array $data, $id);
-    public function delete($id);
+    public function getAllNews();
+    public function getNewsById(int $id);
+    public function createNews(array $newsDetails);
+    public function updateNews(array $newsDetails, int $id);
+    public function deleteNews(int $id);
 }

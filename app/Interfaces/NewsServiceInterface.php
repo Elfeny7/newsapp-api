@@ -4,9 +4,9 @@ namespace App\Interfaces;
 
 interface NewsServiceInterface
 {
-    public function index();
+    public function getAllNews();
+    public function getNewsById(int $id);
     public function createNews(array $payload);
-    public function getbyId(string $id);
-    public function updateNews(array $payload, string $id);
-    public function deleteNews(string $id);
+    public function updateNews(array $payload, int $id);
+    public function deleteNews(int $id);
 }

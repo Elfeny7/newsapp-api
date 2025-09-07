@@ -21,7 +21,7 @@ class NewsController extends Controller
     public function index()
     {
         try {
-            $data = $this->newsServiceInterface->index();
+            $data = $this->newsServiceInterface->getAllNews();
             return ApiResponse::success(NewsResource::collection($data), 'News data retrieved', 200);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
@@ -38,17 +38,17 @@ class NewsController extends Controller
         }
     }
 
-    public function show(string $id)
+    public function show(int $id)
     {
         try {
-            $news = $this->newsServiceInterface->getById($id);
+            $news = $this->newsServiceInterface->getNewsById($id);
             return ApiResponse::success(new NewsResource($news), 'News retrieved', 200);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }
     }
 
-    public function update(UpdateNewsRequest $request, string $id)
+    public function update(UpdateNewsRequest $request, int $id)
     {
         try {
             $this->newsServiceInterface->updateNews($request->getUpdateNewsPayload(), $id);
@@ -58,7 +58,7 @@ class NewsController extends Controller
         }
     }
 
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
         try {
             $this->newsServiceInterface->deleteNews($id);
