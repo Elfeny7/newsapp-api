@@ -4,9 +4,9 @@ namespace App\Interfaces;
 
 interface CategoryServiceInterface
 {
-    public function index();
+    public function getAllCategory();
+    public function getCategoryById(int $id);
     public function createCategory(array $payload);
-    public function getbyId(string $id);
-    public function updateCategory(array $payload, string $id);
-    public function deleteCategory(string $id);
+    public function updateCategory(array $payload, int $id);
+    public function deleteCategory(int $id);
 }

@@ -32,11 +32,11 @@ class UpdateCategoryRequest extends FormRequest
     public function getUpdateCategoryPayload(): array
     {
         return [
-            'name' => $this->input('name'),
-            'slug' => $this->input('slug'),
+            'name'        => $this->input('name'),
+            'slug'        => $this->input('slug'),
             'description' => $this->input('description'),
-            'parent_id' => $this->input('parent_id'),
-            'status' => $this->input('status'),
+            'parent_id'   => $this->input('parent_id'),
+            'status'      => $this->input('status'),
         ];
     }
 }

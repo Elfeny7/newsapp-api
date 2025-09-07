@@ -9,7 +9,6 @@ use App\Interfaces\TokenServiceInterface;
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\UserNotFoundException;
 use App\Logging\AuthLogger;
-use Illuminate\Container\Attributes\Auth;
 
 class AuthService implements AuthServiceInterface
 {
@@ -22,7 +21,7 @@ class AuthService implements AuthServiceInterface
         $this->tokenServiceInterface = $tokenServiceInterface;
     }
 
-    public function register($payload)
+    public function register(array $payload)
     {
         return DB::transaction(function () use ($payload) {
             try {
@@ -38,7 +37,7 @@ class AuthService implements AuthServiceInterface
         });
     }
 
-    public function login($credentials)
+    public function login(array $credentials)
     {
         $token = $this->tokenServiceInterface->attempt($credentials);
         if (!$token) {
@@ -46,7 +45,7 @@ class AuthService implements AuthServiceInterface
             throw new InvalidCredentialsException();
         }
 
-        $user = $this->getUser();
+        $user = $this->getAuthenticatedUser();
         AuthLogger::loginSuccess($user);
 
         return [
@@ -60,9 +59,9 @@ class AuthService implements AuthServiceInterface
     {
         try {
             $this->tokenServiceInterface->invalidate();
-            AuthLogger::logoutSuccess($this->getUser());
+            AuthLogger::logoutSuccess($this->getAuthenticatedUser());
         } catch (\Exception $e) {
-            AuthLogger::logoutFailed($this->getUser(), $e->getMessage());
+            AuthLogger::logoutFailed($this->getAuthenticatedUser(), $e->getMessage());
             throw $e;
         }
     }
@@ -72,12 +71,12 @@ class AuthService implements AuthServiceInterface
         return $this->userRepositoryInterface->getAllUsers();
     }
 
-    public function getUserById($id)
+    public function getUserById(int $id)
     {
         return $this->userRepositoryInterface->getUserById($id);
     }
     
-    public function getUser()
+    public function getAuthenticatedUser()
     {
         $user = $this->tokenServiceInterface->getUser();
         if (!$user) {
@@ -86,7 +85,7 @@ class AuthService implements AuthServiceInterface
         return $user;
     }
 
-    public function updateUser(array $payload, string $id)
+    public function updateUser(array $payload, int $id)
     {
         DB::beginTransaction();
         try {
@@ -108,7 +107,7 @@ class AuthService implements AuthServiceInterface
         }
     }
 
-    public function deleteUser($id)
+    public function deleteUser(int $id)
     {
         try {
             $this->userRepositoryInterface->deleteUser($id);

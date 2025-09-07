@@ -20,7 +20,7 @@ class CategoryController extends Controller
     public function index()
     {
         try {
-            $data = $this->categoryServiceInterface->index();
+            $data = $this->categoryServiceInterface->getAllCategory();
             return ApiResponse::success(CategoryResource::collection($data), 'Category data retrieved', 200);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
@@ -33,13 +33,14 @@ class CategoryController extends Controller
             $category = $this->categoryServiceInterface->createCategory($request->getStoreCategoryPayload());
             return ApiResponse::success(new CategoryResource($category), 'Category Create successsful', 201);
         } catch (\Exception $e) {
+            return ApiResponse::throw($e);
         }
     }
 
     public function show(string $id)
     {
         try {
-            $category = $this->categoryServiceInterface->getById($id);
+            $category = $this->categoryServiceInterface->getCategoryById($id);
             return ApiResponse::success(new CategoryResource($category), 'Category retrieved', 200);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
