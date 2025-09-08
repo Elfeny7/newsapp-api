@@ -51,7 +51,7 @@ class CategoryController extends Controller
     {
         try {
             $this->categoryServiceInterface->updateCategory($request->getUpdateCategoryPayload(), $id);
-            return ApiResponse::success('', 'Category Update successsful', 201);
+            return ApiResponse::success('', 'Category Update successsful', 200);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }

@@ -52,7 +52,7 @@ class NewsController extends Controller
     {
         try {
             $this->newsServiceInterface->updateNews($request->getUpdateNewsPayload(), $id);
-            return ApiResponse::success('', 'News Update successsful', 201);
+            return ApiResponse::success('', 'News Update successsful', 200);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }

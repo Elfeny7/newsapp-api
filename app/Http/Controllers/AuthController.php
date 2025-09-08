@@ -45,7 +45,7 @@ class AuthController extends Controller
     {
         try {
             $this->authServiceInterface->updateUser($request->getUpdatePayload(), $id);
-            return ApiResponse::success('', 'User Update successsful', 201);
+            return ApiResponse::success('', 'User Update successsful', 200);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }
