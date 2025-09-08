@@ -37,7 +37,7 @@ class CategoryController extends Controller
         }
     }
 
-    public function show(string $id)
+    public function show(int $id)
     {
         try {
             $category = $this->categoryServiceInterface->getCategoryById($id);
@@ -47,17 +47,17 @@ class CategoryController extends Controller
         }
     }
 
-    public function update(UpdateCategoryRequest $request, string $id)
+    public function update(UpdateCategoryRequest $request, int $id)
     {
         try {
-            $category = $this->categoryServiceInterface->updateCategory($request->getUpdateCategoryPayload(), $id);
-            return ApiResponse::success(new CategoryResource($category), 'Category Update successsful', 201);
+            $this->categoryServiceInterface->updateCategory($request->getUpdateCategoryPayload(), $id);
+            return ApiResponse::success('', 'Category Update successsful', 201);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }
     }
 
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
         try {
             $this->categoryServiceInterface->deleteCategory($id);
