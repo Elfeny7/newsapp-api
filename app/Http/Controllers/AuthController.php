@@ -31,7 +31,7 @@ class AuthController extends Controller
         }
     }
 
-    public function show(string $id)
+    public function show(int $id)
     {
         try {
             $user = $this->authServiceInterface->getUserById($id);
@@ -41,7 +41,7 @@ class AuthController extends Controller
         }
     }
 
-    public function update(UpdateUserRequest $request, string $id)
+    public function update(UpdateUserRequest $request, int $id)
     {
         try {
             $this->authServiceInterface->updateUser($request->getUpdatePayload(), $id);
@@ -51,7 +51,7 @@ class AuthController extends Controller
         }
     }
 
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
         try {
             $this->authServiceInterface->deleteUser($id);
@@ -111,7 +111,7 @@ class AuthController extends Controller
     public function getUser()
     {
         try {
-            $user = new UserResource($this->authServiceInterface->getUser());
+            $user = new UserResource($this->authServiceInterface->getAuthenticatedUser());
             return ApiResponse::success($user, 'User Retrieved', 200);
         } catch (UserNotFoundException $e) {
             return ApiResponse::throw($e, 'User Not Found', 404);
