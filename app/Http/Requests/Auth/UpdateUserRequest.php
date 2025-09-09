@@ -20,6 +20,7 @@ class UpdateUserRequest extends FormRequest
             'name'      => 'required|string|max:255',
             'email'     => 'required|string|email|max:255|unique:users,email,' . $this->route('user'),
             'password'  => 'nullable|string|min:6|confirmed',
+            'role'      => 'nullable|string'
         ];
     }
 
@@ -33,6 +34,7 @@ class UpdateUserRequest extends FormRequest
         $payload = [
             'name'      => $this->input('name'),
             'email'     => $this->input('email'),
+            'role'     => $this->input('role'),
         ];
 
         if ($this->filled('password')) {

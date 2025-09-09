@@ -89,20 +89,21 @@ class AuthService implements AuthServiceInterface
     {
         DB::beginTransaction();
         try {
-            $existingUSer = $this->userRepositoryInterface->getUserById($id);
+            $existingUser = $this->userRepositoryInterface->getUserById($id);
             $updateDetails = [
-                'name'   => $payload['name'] ?? $existingUSer->name,
-                'email'  => $payload['email'] ?? $existingUSer->email,
-                'password'  => $payload['password'] ?? $existingUSer->password,
+                'name'   => $payload['name'] ?? $existingUser->name,
+                'email'  => $payload['email'] ?? $existingUser->email,
+                'password'  => $payload['password'] ?? $existingUser->password,
+                'role'  => $payload['role'] ?? $existingUser->role,
             ];
             $this->userRepositoryInterface->updateUser($updateDetails, $id);
 
             DB::commit();
-            AuthLogger::updateSuccess($updateDetails, $existingUSer);
+            AuthLogger::updateSuccess($updateDetails, $existingUser);
         } catch (\Exception $e){
 
             DB::rollBack();
-            AuthLogger::updateFailed($updateDetails, $existingUSer, $e);
+            AuthLogger::updateFailed($updateDetails, $existingUser, $e);
             throw $e;
         }
     }

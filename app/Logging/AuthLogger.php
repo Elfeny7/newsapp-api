@@ -12,6 +12,7 @@ class AuthLogger
         Log::channel('auth')->info('User login success', [
             'user_id' => $user->id,
             'email' => $user->email,
+            'role' => $user->role,
             'ip' => request()->ip(),
             'time' => now()->toDateTimeString()
         ]);
@@ -22,6 +23,7 @@ class AuthLogger
         Log::channel('auth')->info('User register success', [
             'user_id' => $user->id,
             'email' => $user->email,
+            'role' => $user->role,
             'ip' => request()->ip(),
             'time' => now()->toDateTimeString()
         ]);
