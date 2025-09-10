@@ -2,14 +2,19 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Interfaces\AuthServiceInterface;
 use App\Interfaces\TokenServiceInterface;
 use App\Services\AuthService;
 use App\Services\JWTTokenService;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
+    protected $policies = [
+        \App\Models\News::class => \App\Policies\NewsPolicy::class
+    ];
+
     public function register(): void
     {
         $this->app->bind(AuthServiceInterface::class, AuthService::class);
@@ -18,6 +23,10 @@ class AuthServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        $this->registerPolicies();
+
+        Gate::define('manage-user', function ($user) {
+            return $user->role === 'superadmin';
+        });
     }
 }

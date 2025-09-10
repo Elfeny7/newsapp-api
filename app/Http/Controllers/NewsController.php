@@ -7,10 +7,10 @@ use App\Http\Requests\News\UpdateNewsRequest;
 use App\Interfaces\NewsServiceInterface;
 use App\Http\Resources\NewsResource;
 use App\Support\ApiResponse;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class NewsController extends Controller
 {
-
     private NewsServiceInterface $newsServiceInterface;
 
     public function __construct(NewsServiceInterface $newsServiceInterface)
@@ -51,8 +51,11 @@ class NewsController extends Controller
     public function update(UpdateNewsRequest $request, int $id)
     {
         try {
+            $this->authorize('update',  $this->newsServiceInterface->getNewsById($id));
             $this->newsServiceInterface->updateNews($request->getUpdateNewsPayload(), $id);
             return ApiResponse::success('', 'News Update successsful', 200);
+        } catch (AuthorizationException $e) {
+            return ApiResponse::throw($e, 'Unauthorized', 403);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }
