@@ -21,7 +21,7 @@ class JwtMiddleware
         try {
             $this->tokenServiceInterface->authenticate();
         } catch (\Exception $e) {
-            return ApiResponse::throw($e, "Unauthorized", 401);
+            return ApiResponse::throw($e, 'Unauthenticated', 401);
         }
         return $next($request);
     }
