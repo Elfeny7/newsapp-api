@@ -31,8 +31,11 @@ class NewsController extends Controller
     public function store(StoreNewsRequest $request)
     {
         try {
+            $this->authorize('create-news');
             $news = $this->newsServiceInterface->createNews($request->getStoreNewsPayload());
             return ApiResponse::success(new NewsResource($news), 'News Create successsful', 201);
+        } catch (AuthorizationException $e) {
+            return ApiResponse::throw($e, 'Unauthorized', 403);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }
@@ -64,7 +67,7 @@ class NewsController extends Controller
     public function destroy(int $id)
     {
         try {
-            $this->authorize('delete',  $this->newsServiceInterface->getNewsById($id));
+            $this->authorize('delete');
             $this->newsServiceInterface->deleteNews($id);
             return ApiResponse::success('', 'News Delete successsful', 204);
         } catch (AuthorizationException $e) {

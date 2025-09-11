@@ -11,9 +11,4 @@ class NewsPolicy
     {
         return $user->role === 'superadmin' || $user->id === $news->published_by;
     }
-
-    public function delete(User $user, News $news): bool
-    {
-        return $user->role === 'superadmin' || $user->id === $news->published_by;
-    }
 }

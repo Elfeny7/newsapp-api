@@ -28,5 +28,13 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('manage-user', function ($user) {
             return $user->role === 'superadmin';
         });
+
+        Gate::define('create-news', function ($user) {
+            return $user->role === 'superadmin';
+        });
+
+        Gate::define('delete-news', function ($user) {
+            return $user->role === 'superadmin';
+        });
     }
 }
