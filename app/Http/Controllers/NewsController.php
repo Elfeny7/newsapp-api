@@ -64,8 +64,11 @@ class NewsController extends Controller
     public function destroy(int $id)
     {
         try {
+            $this->authorize('delete',  $this->newsServiceInterface->getNewsById($id));
             $this->newsServiceInterface->deleteNews($id);
             return ApiResponse::success('', 'News Delete successsful', 204);
+        } catch (AuthorizationException $e) {
+            return ApiResponse::throw($e, 'Unauthorized', 403);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }
