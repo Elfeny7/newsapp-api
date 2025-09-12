@@ -75,7 +75,7 @@ class AuthService implements AuthServiceInterface
     {
         return $this->userRepositoryInterface->getUserById($id);
     }
-    
+
     public function getAuthenticatedUser()
     {
         $user = $this->tokenServiceInterface->getUser();
@@ -83,6 +83,21 @@ class AuthService implements AuthServiceInterface
             throw new UserNotFoundException();
         }
         return $user;
+    }
+
+    public function createUser(array $payload)
+    {
+        DB::beginTransaction();
+        try {
+            $user = $this->userRepositoryInterface->createUser($payload);
+            DB::commit();
+            AuthLogger::createSuccess($payload, $this->getAuthenticatedUser());
+            return $user;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            AuthLogger::createFailed($payload, $e, $this->getAuthenticatedUser());
+            throw $e;
+        }
     }
 
     public function updateUser(array $payload, int $id)
@@ -99,11 +114,11 @@ class AuthService implements AuthServiceInterface
             $this->userRepositoryInterface->updateUser($updateDetails, $id);
 
             DB::commit();
-            AuthLogger::updateSuccess($updateDetails, $existingUser);
-        } catch (\Exception $e){
+            AuthLogger::updateSuccess($updateDetails, $existingUser, $this->getAuthenticatedUser());
+        } catch (\Exception $e) {
 
             DB::rollBack();
-            AuthLogger::updateFailed($updateDetails, $existingUser, $e);
+            AuthLogger::updateFailed($updateDetails, $existingUser, $e, $this->getAuthenticatedUser());
             throw $e;
         }
     }
@@ -112,9 +127,9 @@ class AuthService implements AuthServiceInterface
     {
         try {
             $this->userRepositoryInterface->deleteUser($id);
-            AuthLogger::deleteSuccess($id);
+            AuthLogger::deleteSuccess($id, $this->getAuthenticatedUser());
         } catch (\Exception $e) {
-            AuthLogger::deleteFailed($id, $e);
+            AuthLogger::deleteFailed($id, $e, $this->getAuthenticatedUser());
             throw $e;
         }
     }

@@ -7,6 +7,7 @@ use App\Support\ApiResponse;
 use App\Interfaces\AuthServiceInterface;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Requests\Auth\LoginUserRequest;
+use App\Http\Requests\Auth\StoreUserRequest;
 use App\Http\Requests\Auth\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Exceptions\InvalidCredentialsException;
@@ -36,6 +37,16 @@ class AuthController extends Controller
         try {
             $user = $this->authServiceInterface->getUserById($id);
             return ApiResponse::success(new UserResource($user), 'User Retrieved', 200);
+        } catch (\Exception $e) {
+            return ApiResponse::throw($e);
+        }
+    }
+
+    public function store(StoreUserRequest $request)
+    {
+        try {
+            $user = $this->authServiceInterface->createUser($request->getStorePayload());
+            return ApiResponse::success(new UserResource($user), 'User Create successsful', 201);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }
