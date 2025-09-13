@@ -41,7 +41,7 @@ class AuthService implements AuthServiceInterface
             return $user;
         } catch (\Exception $e) {
             DB::rollBack();
-            AuthLogger::createFailed($payload, $e, $this->getAuthenticatedUser());
+            AuthLogger::createFailed($payload, $e->getMessage(), $this->getAuthenticatedUser());
             throw $e;
         }
     }
@@ -75,7 +75,7 @@ class AuthService implements AuthServiceInterface
             $this->userRepositoryInterface->deleteUser($id);
             AuthLogger::deleteSuccess($id, $this->getAuthenticatedUser());
         } catch (\Exception $e) {
-            AuthLogger::deleteFailed($id, $e, $this->getAuthenticatedUser());
+            AuthLogger::deleteFailed($id, $e->getMessage(), $this->getAuthenticatedUser());
             throw $e;
         }
     }
