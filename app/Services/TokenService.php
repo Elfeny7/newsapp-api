@@ -5,7 +5,7 @@ use App\Interfaces\TokenServiceInterface;
 use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class JWTTokenService implements TokenServiceInterface
+class TokenService implements TokenServiceInterface
 {
     public function generate(User $user): string {
         return JWTAuth::fromUser($user);

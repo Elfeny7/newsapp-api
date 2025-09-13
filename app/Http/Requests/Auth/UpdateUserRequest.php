@@ -34,7 +34,7 @@ class UpdateUserRequest extends FormRequest
         $payload = [
             'name'      => $this->input('name'),
             'email'     => $this->input('email'),
-            'role'     => $this->input('role'),
+            'role'      => $this->input('role'),
         ];
 
         if ($this->filled('password')) {

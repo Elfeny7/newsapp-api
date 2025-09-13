@@ -6,7 +6,7 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use App\Interfaces\AuthServiceInterface;
 use App\Interfaces\TokenServiceInterface;
 use App\Services\AuthService;
-use App\Services\JWTTokenService;
+use App\Services\TokenService;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
@@ -18,7 +18,7 @@ class AuthServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(AuthServiceInterface::class, AuthService::class);
-        $this->app->bind(TokenServiceInterface::class, JWTTokenService::class);
+        $this->app->bind(TokenServiceInterface::class, TokenService::class);
     }
 
     public function boot(): void
