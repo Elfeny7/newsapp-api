@@ -8,6 +8,7 @@ use App\Interfaces\TokenServiceInterface;
 use App\Services\AuthService;
 use App\Services\TokenService;
 use App\Policies\UserPolicy;
+use App\Policies\NewsPolicy;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
@@ -25,15 +26,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerPolicies();
-
         Gate::policy('manage-user', UserPolicy::class);
-
-        Gate::define('create-news', function ($user) {
-            return $user->role === 'superadmin';
-        });
-
-        Gate::define('delete-news', function ($user) {
-            return $user->role === 'superadmin';
-        });
+        Gate::policy('manage-news', NewsPolicy::class);
     }
 }
