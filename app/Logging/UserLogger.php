@@ -5,7 +5,7 @@ namespace App\Logging;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
-class AuthLogger
+class UserLogger
 {
     public static function createSuccess($payload, $user)
     {
@@ -39,12 +39,14 @@ class AuthLogger
     public static function updateSuccess($payload, $existingUser, $user)
     {
         Log::channel('user')->info('User updated', [
-            'old_data' => $existingUser,
-            'new_data' => $payload,
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'name' => $user->name,
-            'role' => $user->role,
+            'changes' => array_diff_assoc($payload, $existingUser->toArray()),
+            'changes' => $payload,
+            'action_by' => [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'name' => $user->name,
+                'role' => $user->role,
+            ],
             'time' => now()->toDateTimeString()
         ]);
     }
@@ -52,12 +54,15 @@ class AuthLogger
     public static function updateFailed($payload, $existingUser, $message, $user)
     {
         Log::channel('user')->warning('User update failed', [
-            'old_data' => $existingUser,
-            'new_data' => $payload ?? null,
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'name' => $user->name,
-            'role' => $user->role,
+            'changes' => $existingUser
+                ? array_diff_assoc($payload, $existingUser->toArray())
+                : $payload,
+            'action_by' => [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'name' => $user->name,
+                'role' => $user->role,
+            ],
             'reason' => $message,
             'time' => now()->toDateTimeString()
         ]);

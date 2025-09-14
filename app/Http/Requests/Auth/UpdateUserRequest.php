@@ -17,10 +17,10 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|string|email|max:255|unique:users,email,' . $this->route('user'),
-            'password'  => 'nullable|string|min:6|confirmed',
-            'role'      => 'nullable|string'
+            'name'     => 'sometimes|string|max:255',
+            'email'    => 'sometimes|string|email|max:255|unique:users,email,' . $this->route('user'),
+            'password' => 'sometimes|string|min:6|confirmed',
+            'role'     => 'sometimes|string'
         ];
     }
 
@@ -31,11 +31,7 @@ class UpdateUserRequest extends FormRequest
 
     public function getUpdatePayload(): array
     {
-        $payload = [
-            'name'      => $this->input('name'),
-            'email'     => $this->input('email'),
-            'role'      => $this->input('role'),
-        ];
+        $payload = $this->only(['name', 'email', 'role']);
 
         if ($this->filled('password')) {
             $payload['password'] = Hash::make($this->password);
