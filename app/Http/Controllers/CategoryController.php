@@ -7,6 +7,7 @@ use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Support\ApiResponse;
 use App\Http\Resources\CategoryResource;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class CategoryController extends Controller
 {
@@ -30,8 +31,11 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request)
     {
         try {
+            $this->authorize('create', 'manage-category');
             $category = $this->categoryServiceInterface->createCategory($request->getStoreCategoryPayload());
             return ApiResponse::success(new CategoryResource($category), 'Category Create successsful', 201);
+        } catch (AuthorizationException $e) {
+            return ApiResponse::throw($e, 'Unauthorized', 403);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }
@@ -50,8 +54,11 @@ class CategoryController extends Controller
     public function update(UpdateCategoryRequest $request, int $id)
     {
         try {
+            $this->authorize('update', 'manage-category');
             $this->categoryServiceInterface->updateCategory($request->getUpdateCategoryPayload(), $id);
             return ApiResponse::success('', 'Category Update successsful', 200);
+        } catch (AuthorizationException $e) {
+            return ApiResponse::throw($e, 'Unauthorized', 403);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }
@@ -60,8 +67,11 @@ class CategoryController extends Controller
     public function destroy(int $id)
     {
         try {
+            $this->authorize('delete', 'manage-category');
             $this->categoryServiceInterface->deleteCategory($id);
             return ApiResponse::success('', 'Category Delete successsful', 204);
+        } catch (AuthorizationException $e) {
+            return ApiResponse::throw($e, 'Unauthorized', 403);
         } catch (\Exception $e) {
             return ApiResponse::throw($e);
         }

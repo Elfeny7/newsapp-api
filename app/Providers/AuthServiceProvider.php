@@ -9,6 +9,7 @@ use App\Services\AuthService;
 use App\Services\TokenService;
 use App\Policies\UserPolicy;
 use App\Policies\NewsPolicy;
+use App\Policies\CategoryPolicy;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
@@ -28,5 +29,6 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
         Gate::policy('manage-user', UserPolicy::class);
         Gate::policy('manage-news', NewsPolicy::class);
+        Gate::policy('manage-category', CategoryPolicy::class);
     }
 }
