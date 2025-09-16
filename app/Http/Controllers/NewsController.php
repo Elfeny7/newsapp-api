@@ -7,7 +7,6 @@ use App\Http\Requests\News\UpdateNewsRequest;
 use App\Interfaces\NewsServiceInterface;
 use App\Http\Resources\NewsResource;
 use App\Support\ApiResponse;
-use Illuminate\Auth\Access\AuthorizationException;
 
 class NewsController extends Controller
 {
@@ -20,60 +19,34 @@ class NewsController extends Controller
 
     public function index()
     {
-        try {
-            $data = $this->newsServiceInterface->getAllNews();
-            return ApiResponse::success(NewsResource::collection($data), 'News data retrieved', 200);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $data = $this->newsServiceInterface->getAllNews();
+        return ApiResponse::success(NewsResource::collection($data), 'News data retrieved', 200);
     }
 
     public function store(StoreNewsRequest $request)
     {
-        try {
-            $this->authorize('create', 'manage-news');
-            $news = $this->newsServiceInterface->createNews($request->getStoreNewsPayload());
-            return ApiResponse::success(new NewsResource($news), 'News Create successsful', 201);
-        } catch (AuthorizationException $e) {
-            return ApiResponse::throw($e, 'Unauthorized', 403);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $this->authorize('create', 'manage-news');
+        $news = $this->newsServiceInterface->createNews($request->getStoreNewsPayload());
+        return ApiResponse::success(new NewsResource($news), 'News Create successsful', 201);
     }
 
     public function show(int $id)
     {
-        try {
-            $news = $this->newsServiceInterface->getNewsById($id);
-            return ApiResponse::success(new NewsResource($news), 'News retrieved', 200);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $news = $this->newsServiceInterface->getNewsById($id);
+        return ApiResponse::success(new NewsResource($news), 'News retrieved', 200);
     }
 
     public function update(UpdateNewsRequest $request, int $id)
     {
-        try {
-            $this->authorize('update',  $this->newsServiceInterface->getNewsById($id));
-            $this->newsServiceInterface->updateNews($request->getUpdateNewsPayload(), $id);
-            return ApiResponse::success('', 'News Update successsful', 200);
-        } catch (AuthorizationException $e) {
-            return ApiResponse::throw($e, 'Unauthorized', 403);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $this->authorize('update',  $this->newsServiceInterface->getNewsById($id));
+        $this->newsServiceInterface->updateNews($request->getUpdateNewsPayload(), $id);
+        return ApiResponse::success('', 'News Update successsful', 200);
     }
 
     public function destroy(int $id)
     {
-        try {
-            $this->authorize('delete', 'manage-news');
-            $this->newsServiceInterface->deleteNews($id);
-            return ApiResponse::success('', 'News Delete successsful', 204);
-        } catch (AuthorizationException $e) {
-            return ApiResponse::throw($e, 'Unauthorized', 403);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $this->authorize('delete', 'manage-news');
+        $this->newsServiceInterface->deleteNews($id);
+        return ApiResponse::success('', 'News Delete successsful', 204);
     }
 }

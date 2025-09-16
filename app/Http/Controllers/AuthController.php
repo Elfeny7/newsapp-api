@@ -22,62 +22,34 @@ class AuthController extends Controller
 
     public function register(RegisterUserRequest $request)
     {
-        try {
-            $data = $this->authServiceInterface->register($request->getRegisterPayload());
-            $responseData = [
-                'user' => new UserResource($data['user']),
-                'token' => $data['token']
-            ];
-            return ApiResponse::success($responseData, 'Register Successful', 201);
-        } catch (JWTException $e) {
-            return ApiResponse::throw($e, $e->getMessage() ?: 'Register Failed', 401);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $data = $this->authServiceInterface->register($request->getRegisterPayload());
+        $responseData = [
+            'user' => new UserResource($data['user']),
+            'token' => $data['token']
+        ];
+        return ApiResponse::success($responseData, 'Register Successful', 201);
     }
 
     public function login(LoginUserRequest $request)
     {
-        try {
-            $data = $this->authServiceInterface->login($request->getCredentials());
-            $responseData = [
-                'user' => new UserResource($data['user']),
-                'token' => $data['token'],
-                'expires_in' => $data['expires_in']
-            ];
-            return ApiResponse::success($responseData, 'Login Successful', 200);
-        } catch (InvalidCredentialsException $e) {
-            return ApiResponse::throw($e, 'Invalid Credentials', 401);
-        } catch (JWTException $e) {
-            return ApiResponse::throw($e, $e->getMessage() ?: 'Login Failed', 401);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $data = $this->authServiceInterface->login($request->getCredentials());
+        $responseData = [
+            'user' => new UserResource($data['user']),
+            'token' => $data['token'],
+            'expires_in' => $data['expires_in']
+        ];
+        return ApiResponse::success($responseData, 'Login Successful', 200);
     }
 
     public function logout()
     {
-        try {
-            $this->authServiceInterface->logout();
-            return ApiResponse::success('', 'Logout Successful', 200);
-        } catch (JWTException $e) {
-            return ApiResponse::throw($e, $e->getMessage() ?: 'Logout Failed', 401);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $this->authServiceInterface->logout();
+        return ApiResponse::success('', 'Logout Successful', 200);
     }
 
     public function getUser()
     {
-        try {
-            $user = new UserResource($this->authServiceInterface->getAuthenticatedUser());
-            return ApiResponse::success($user, 'User Retrieved', 200);
-        } catch (UserNotFoundException $e) {
-            return ApiResponse::throw($e, 'User Not Found', 404);
-        } catch (JWTException $e) {
-            return ApiResponse::throw($e, $e->getMessage() ?: 'Failed to Retrieve User', 401);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $user = new UserResource($this->authServiceInterface->getAuthenticatedUser());
+        return ApiResponse::success($user, 'User Retrieved', 200);
     }
 }

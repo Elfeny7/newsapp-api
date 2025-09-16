@@ -7,7 +7,6 @@ use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Support\ApiResponse;
 use App\Http\Resources\CategoryResource;
-use Illuminate\Auth\Access\AuthorizationException;
 
 class CategoryController extends Controller
 {
@@ -20,60 +19,34 @@ class CategoryController extends Controller
 
     public function index()
     {
-        try {
-            $data = $this->categoryServiceInterface->getAllCategory();
-            return ApiResponse::success(CategoryResource::collection($data), 'Category data retrieved', 200);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $data = $this->categoryServiceInterface->getAllCategory();
+        return ApiResponse::success(CategoryResource::collection($data), 'Category data retrieved', 200);
     }
 
     public function store(StoreCategoryRequest $request)
     {
-        try {
-            $this->authorize('create', 'manage-category');
-            $category = $this->categoryServiceInterface->createCategory($request->getStoreCategoryPayload());
-            return ApiResponse::success(new CategoryResource($category), 'Category Create successsful', 201);
-        } catch (AuthorizationException $e) {
-            return ApiResponse::throw($e, 'Unauthorized', 403);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $this->authorize('create', 'manage-category');
+        $category = $this->categoryServiceInterface->createCategory($request->getStoreCategoryPayload());
+        return ApiResponse::success(new CategoryResource($category), 'Category Create successsful', 201);
     }
 
     public function show(int $id)
     {
-        try {
-            $category = $this->categoryServiceInterface->getCategoryById($id);
-            return ApiResponse::success(new CategoryResource($category), 'Category retrieved', 200);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $category = $this->categoryServiceInterface->getCategoryById($id);
+        return ApiResponse::success(new CategoryResource($category), 'Category retrieved', 200);
     }
 
     public function update(UpdateCategoryRequest $request, int $id)
     {
-        try {
-            $this->authorize('update', 'manage-category');
-            $this->categoryServiceInterface->updateCategory($request->getUpdateCategoryPayload(), $id);
-            return ApiResponse::success('', 'Category Update successsful', 200);
-        } catch (AuthorizationException $e) {
-            return ApiResponse::throw($e, 'Unauthorized', 403);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $this->authorize('update', 'manage-category');
+        $this->categoryServiceInterface->updateCategory($request->getUpdateCategoryPayload(), $id);
+        return ApiResponse::success('', 'Category Update successsful', 200);
     }
 
     public function destroy(int $id)
     {
-        try {
-            $this->authorize('delete', 'manage-category');
-            $this->categoryServiceInterface->deleteCategory($id);
-            return ApiResponse::success('', 'Category Delete successsful', 204);
-        } catch (AuthorizationException $e) {
-            return ApiResponse::throw($e, 'Unauthorized', 403);
-        } catch (\Exception $e) {
-            return ApiResponse::throw($e);
-        }
+        $this->authorize('delete', 'manage-category');
+        $this->categoryServiceInterface->deleteCategory($id);
+        return ApiResponse::success('', 'Category Delete successsful', 204);
     }
 }
