@@ -5,9 +5,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Support\ApiResponse;
-use App\Exceptions\InvalidCredentialsException;
-use App\Exceptions\UserNotFoundException;
-use Tymon\JWTAuth\Exceptions\JWTException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
