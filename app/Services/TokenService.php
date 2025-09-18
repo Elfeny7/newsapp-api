@@ -34,13 +34,24 @@ class TokenService implements TokenServiceInterface
         JWTAuth::invalidate(JWTAuth::getToken());
     }
 
+    public function refresh(): string {
+        return JWTAuth::refresh(JWTAuth::getToken());
+    }
+
+    public function getRefreshTTL(): int {
+        return JWTAuth::factory()->getRefreshTTL() * 60;
+    }
+
+
+
+
     public function validate(string $token): bool {
         return JWTAuth::setToken($token)->check();
     }
 
-    public function refresh(string $token): string {
-        return JWTAuth::setToken($token)->refresh();
-    }
+    // public function refresh(string $token): string {
+    //     return JWTAuth::setToken($token)->refresh();
+    // }
 
     public function getUserFromToken(string $token): ?User {
         return JWTAuth::setToken($token)->authenticate();

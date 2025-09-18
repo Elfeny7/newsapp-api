@@ -74,4 +74,13 @@ class AuthService implements AuthServiceInterface
         }
         return $user;
     }
+
+    public function refresh()
+    {
+        $token = $this->tokenServiceInterface->refresh();
+        return [
+            'token' => $token,
+            'expires_in' => $this->tokenServiceInterface->getRefreshTTL(),
+        ];
+    }
 }

@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Support\ApiResponse;
 use App\Interfaces\AuthServiceInterface;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Requests\Auth\LoginUserRequest;
 use App\Http\Resources\UserResource;
-use App\Exceptions\InvalidCredentialsException;
-use App\Exceptions\UserNotFoundException;
 
 class AuthController extends Controller
 {
@@ -51,5 +48,11 @@ class AuthController extends Controller
     {
         $user = new UserResource($this->authServiceInterface->getAuthenticatedUser());
         return ApiResponse::success($user, 'User Retrieved', 200);
+    }
+
+    public function refresh()
+    {
+        $data = $this->authServiceInterface->refresh();
+        return ApiResponse::success($data, 'Token Refreshed', 200);
     }
 }

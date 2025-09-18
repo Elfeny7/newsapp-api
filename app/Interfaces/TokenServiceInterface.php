@@ -10,7 +10,11 @@ interface TokenServiceInterface
     public function getTTL(): int;
     public function getUser(): ?User;
     public function invalidate(): void;
+    public function refresh(): string;
+    public function getRefreshTTL(): int;
+
+
     public function validate(string $token): bool;
-    public function refresh(string $token): string;
+    // public function refresh(string $token): string;
     public function getUserFromToken(string $token): ?User;
 }
