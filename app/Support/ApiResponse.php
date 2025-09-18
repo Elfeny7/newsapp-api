@@ -2,29 +2,26 @@
 
 namespace App\Support;
 
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Log;
 
 class ApiResponse
 {
-    public static function throw($e, $message = "Internal server error", $code = 500)
+    public static function error($e, $message = "Internal server error", $code = 500)
     {
         Log::error($e->getMessage(), ['trace' => $e->getTraceAsString()]);
-        $response = [
+        return response()->json([
             'success' => false,
             'message' => $message,
-        ];
-        throw new HttpResponseException(response()->json($response, $code));
+        ], $code);
     }
 
     public static function validationError($errors, $message = "Validation error", $code = 422)
     {
-        $response = [
+        return response()->json([
             'success' => false,
             'message' => $message,
             'errors' => $errors
-        ];
-        throw new HttpResponseException(response()->json($response, $code));
+        ], $code);
     }
 
     public static function success($result = null, $message = "Success", $code = 200)

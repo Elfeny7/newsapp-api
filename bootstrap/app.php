@@ -25,30 +25,30 @@ return Application::configure(basePath: dirname(__DIR__))
                     return ApiResponse::validationError($e->errors(), 'Validation failed', 422);
                 }
                 if ($e instanceof \Tymon\JWTAuth\Exceptions\JWTException) {
-                    return ApiResponse::throw($e, $e->getMessage() ?: 'Authentication failed', 401);
+                    return ApiResponse::error($e, $e->getMessage() ?: 'Authentication failed', 401);
                 }
                 if ($e instanceof \App\Exceptions\InvalidCredentialsException) {
-                    return ApiResponse::throw($e, 'Invalid Credentials', 401);
+                    return ApiResponse::error($e, 'Invalid Credentials', 401);
                 }
                 if ($e instanceof \App\Exceptions\UserNotFoundException) {
-                    return ApiResponse::throw($e, 'User not found', 404);
+                    return ApiResponse::error($e, 'User not found', 404);
                 }
                 if ($e instanceof \Illuminate\Auth\AuthenticationException) {
-                    return ApiResponse::throw($e, 'Unauthorized', 401);
+                    return ApiResponse::error($e, 'Unauthorized', 401);
                 }
                 if ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
-                    return ApiResponse::throw($e, 'Forbidden', 403);
+                    return ApiResponse::error($e, 'Forbidden', 403);
                 }
                 if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
-                    return ApiResponse::throw($e, 'Resource not found', 404);
+                    return ApiResponse::error($e, 'Resource not found', 404);
                 }
                 if ($e instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException) {
-                    return ApiResponse::throw($e, 'Method not allowed', 405);
+                    return ApiResponse::error($e, 'Method not allowed', 405);
                 }
                 if ($e instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException) {
-                    return ApiResponse::throw($e, 'Too many requests', 429);
+                    return ApiResponse::error($e, 'Too many requests', 429);
                 }
-                return ApiResponse::throw($e, 'Internal server error', 500);
+                return ApiResponse::error($e, 'Internal server error', 500);
             }
         });
     })->create();
