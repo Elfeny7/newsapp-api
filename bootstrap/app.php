@@ -24,8 +24,17 @@ return Application::configure(basePath: dirname(__DIR__))
                 if ($e instanceof \Illuminate\Validation\ValidationException) {
                     return ApiResponse::validationError($e->errors(), 'Validation failed', 422);
                 }
+                if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
+                    return ApiResponse::error($e, 'Token expired', 401);
+                }
+                if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
+                    return ApiResponse::error($e, 'Token invalid', 401);
+                }
+                if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenBlacklistedException) {
+                    return ApiResponse::error($e, 'Token blacklisted', 401);
+                }
                 if ($e instanceof \Tymon\JWTAuth\Exceptions\JWTException) {
-                    return ApiResponse::error($e, $e->getMessage() ?: 'Authentication failed', 401);
+                    return ApiResponse::error($e, 'Token not provided', 400);
                 }
                 if ($e instanceof \App\Exceptions\InvalidCredentialsException) {
                     return ApiResponse::error($e, 'Invalid Credentials', 401);
