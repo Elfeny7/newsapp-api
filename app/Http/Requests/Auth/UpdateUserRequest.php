@@ -3,8 +3,6 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use App\Support\ApiResponse;
 use Illuminate\Support\Facades\Hash;
 
 class UpdateUserRequest extends FormRequest
@@ -22,11 +20,6 @@ class UpdateUserRequest extends FormRequest
             'password' => 'sometimes|string|min:6|confirmed',
             'role'     => 'sometimes|string'
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        return ApiResponse::validationError($validator->errors(), 'Validation errors', 422);
     }
 
     public function getUpdatePayload(): array

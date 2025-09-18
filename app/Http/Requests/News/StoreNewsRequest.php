@@ -3,8 +3,6 @@
 namespace App\Http\Requests\News;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use App\Support\ApiResponse;
 
 class StoreNewsRequest extends FormRequest
 {
@@ -24,11 +22,6 @@ class StoreNewsRequest extends FormRequest
             'category_id'  => 'required|integer|exists:categories,id',
             'status'       => 'required|string|in:draft,published',
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        return ApiResponse::validationError($validator->errors(), 'Validation errors', 422);
     }
 
     public function getStoreNewsPayload(): array

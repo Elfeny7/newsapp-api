@@ -3,9 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Hash;
-use App\Support\ApiResponse;
 
 class RegisterUserRequest extends FormRequest
 {
@@ -21,11 +19,6 @@ class RegisterUserRequest extends FormRequest
             'email'     => 'required|string|email|max:255|unique:users,email',
             'password'  => 'required|string|min:6|confirmed',
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        return ApiResponse::validationError($validator->errors(), 'Validation errors', 422);
     }
 
     public function getRegisterPayload(): array

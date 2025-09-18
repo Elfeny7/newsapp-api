@@ -3,10 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Support\ApiResponse;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Hash;
-
 
 class StoreUserRequest extends FormRequest
 {
@@ -23,11 +20,6 @@ class StoreUserRequest extends FormRequest
             'password'  => 'required|string|min:6',
             'role'      => 'required|string'
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        return ApiResponse::validationError($validator->errors(), 'Validation errors', 422);
     }
 
     public function getStorePayload(): array

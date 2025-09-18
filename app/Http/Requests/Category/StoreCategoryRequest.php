@@ -3,8 +3,6 @@
 namespace App\Http\Requests\Category;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use App\Support\ApiResponse;
 
 class StoreCategoryRequest extends FormRequest
 {
@@ -22,11 +20,6 @@ class StoreCategoryRequest extends FormRequest
             'parent_id'   => 'nullable|integer|exists:categories,id',
             'status'      => 'required|string|in:active,inactive',
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        return ApiResponse::validationError($validator->errors(), 'Validation errors', 422);
     }
 
     public function getStoreCategoryPayload(): array
