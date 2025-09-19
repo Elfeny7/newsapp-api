@@ -40,7 +40,6 @@ class UserLogger
     {
         Log::channel('user')->info('User updated', [
             'changes' => array_diff_assoc($payload, $existingUser->toArray()),
-            'changes' => $payload,
             'action_by' => [
                 'user_id' => $user->id,
                 'email' => $user->email,
