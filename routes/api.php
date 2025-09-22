@@ -12,6 +12,7 @@ Route::post('/refresh', [AuthController::class, 'refresh']);
 
 Route::middleware(['jwt', 'throttle:api'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'getUser']);
     Route::apiResource('users', UserController::class);
     Route::apiResource('news', NewsController::class);
     Route::apiResource('categories', CategoryController::class);
