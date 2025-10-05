@@ -16,7 +16,7 @@ class UpdateNewsRequest extends FormRequest
         return [
             'image'        => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'title'        => 'required|string|max:255',
-            'slug'         => 'nullable|unique:news,slug',
+            'slug'         => 'nullable|unique:news,slug,' . $this->route('news'),
             'excerpt'      => 'required|string|max:500',
             'content'      => 'required|string',
             'category_id'  => 'required|integer|exists:categories,id',
