@@ -35,5 +35,6 @@ class UserSeeder extends Seeder
                 'role' => 'viewer'
             ],
         );
+        User::factory()->count(100)->create();
     }
 }
