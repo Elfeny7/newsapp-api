@@ -16,7 +16,7 @@ class StoreNewsRequest extends FormRequest
         return [
             'image'        => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'title'        => 'required|string|max:255',
-            'slug'         => 'nullable|unique:news,slug',
+            'slug'         => 'required|string|max:255|regex:/^[a-z0-9-]+$/|unique:news,slug',
             'excerpt'      => 'required|string|max:500',
             'content'      => 'required|string',
             'category_id'  => 'required|integer|exists:categories,id',
