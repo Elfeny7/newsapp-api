@@ -70,58 +70,54 @@ class NewsService implements NewsServiceInterface
 
     public function updateNews(array $payload, int $id)
     {
+        $imageName = null;
+        $hasNewImage = false;
+        $oldImage = null;
+
         DB::beginTransaction();
 
         try {
             $existingNews = $this->newsRepositoryInterface->getNewsById($id);
+            $oldImage = $existingNews->image;
+            $hasNewImage = !empty($payload['image']) && $payload['image'] instanceof \Illuminate\Http\UploadedFile;
 
-            if (!empty($payload['image']) && $payload['image'] instanceof \Illuminate\Http\UploadedFile) {
+            if ($hasNewImage) {
                 $imageName = $payload['image']->hashName();
                 Storage::disk('public')->putFileAs('news', $payload['image'], $imageName);
+            }
 
-                $updateDetails = [
-                    'title'   => $payload['title'] ?? $existingNews->title,
-                    'image'   => $imageName,
-                    'slug'    => $payload['slug'] ?? $existingNews->slug,
-                    'excerpt' => $payload['excerpt'] ?? $existingNews->excerpt,
-                    'content' => $payload['content'] ?? $existingNews->content,
-                    'status'  => $payload['status'] ?? $existingNews->status,
-                    'published_at' => array_key_exists('published_at', $payload)
-                        ? $payload['published_at']
-                        : $existingNews->published_at,
-                    'published_by' => $this->authServiceInterface->getAuthenticatedUser()->id,
-                    'category_id' => $payload['category_id'] ?? $existingNews->category_id,
-                ];
-            } else {
-                $updateDetails = [
-                    'title'   => $payload['title'] ?? $existingNews->title,
-                    'slug'    => $payload['slug'] ?? $existingNews->slug,
-                    'excerpt' => $payload['excerpt'] ?? $existingNews->excerpt,
-                    'content' => $payload['content'] ?? $existingNews->content,
-                    'status'  => $payload['status'] ?? $existingNews->status,
-                    'published_at' => array_key_exists('published_at', $payload)
-                        ? $payload['published_at']
-                        : $existingNews->published_at,
-                    'published_by' => $this->authServiceInterface->getAuthenticatedUser()->id,
-                    'category_id' => $payload['category_id'] ?? $existingNews->category_id,
-                ];
+            $updateDetails = [
+                'title'   => $payload['title'] ?? $existingNews->title,
+                'slug'    => $payload['slug'] ?? $existingNews->slug,
+                'excerpt' => $payload['excerpt'] ?? $existingNews->excerpt,
+                'content' => $payload['content'] ?? $existingNews->content,
+                'status'  => $payload['status'] ?? $existingNews->status,
+                'published_at' => array_key_exists('published_at', $payload)
+                    ? $payload['published_at']
+                    : $existingNews->published_at,
+                'published_by' => $this->authServiceInterface->getAuthenticatedUser()->id,
+                'category_id' => $payload['category_id'] ?? $existingNews->category_id,
+            ];
+
+            if ($hasNewImage) {
+                $updateDetails['image'] = $imageName;
             }
 
             $this->newsRepositoryInterface->updateNews($updateDetails, $id);
             DB::commit();
 
-            if ($existingNews->image && Storage::disk('public')->exists('news/' . $existingNews->image)) {
-                Storage::disk('public')->delete('news/' . $existingNews->image);
+            if ($hasNewImage && $oldImage && Storage::disk('public')->exists('news/' . $oldImage)) {
+                Storage::disk('public')->delete('news/' . $oldImage);
             }
 
             NewsLogger::updated($updateDetails, $existingNews, $this->authServiceInterface->getAuthenticatedUser());
         } catch (\Exception $e) {
+            DB::rollBack();
 
             if (!empty($imageName) && Storage::disk('public')->exists('news/' . $imageName)) {
                 Storage::disk('public')->delete('news/' . $imageName);
             }
 
-            DB::rollBack();
             NewsLogger::updateFailed($payload, $existingNews, $this->authServiceInterface->getAuthenticatedUser(), $e);
             throw $e;
         }
