@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('title')->unique();
             $table->string('slug')->unique();
             $table->string('image')->nullable();
-            $table->text('excerpt')->nullable();
+            $table->string('excerpt')->nullable();
             $table->longText('content');
             $table->unsignedBigInteger('views')->default(0);
             $table->enum('status', ['draft', 'published'])->default('draft');
