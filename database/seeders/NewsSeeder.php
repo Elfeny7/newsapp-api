@@ -29,5 +29,6 @@ class NewsSeeder extends Seeder
             'category_id' => 2,
             'published_by' => 1,
         ]);
+        News::factory(10)->create();
     }
 }
