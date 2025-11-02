@@ -15,7 +15,7 @@ class StoreCategoryRequest extends FormRequest
     {
         return [
             'name'        => 'required|string|max:255',
-            'slug'        => 'required|string|max:255|regex:/^[a-z0-9-]+$/|unique:category,slug',
+            'slug'        => 'required|string|max:255|regex:/^[a-z0-9-]+$/|unique:categories,slug',
             'description' => 'required|string',
             'parent_id'   => 'nullable|integer|exists:categories,id',
             'status'      => 'required|string|in:active,inactive',
