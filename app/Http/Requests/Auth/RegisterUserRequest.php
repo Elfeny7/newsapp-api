@@ -24,8 +24,8 @@ class RegisterUserRequest extends FormRequest
     public function getRegisterPayload(): array
     {
         return [
-            'name'     => $this->name,
-            'email'    => $this->email,
+            'name'     => $this->input('name'),
+            'email'    => $this->input('email'),
             'password' => Hash::make($this->password)
         ];
     }

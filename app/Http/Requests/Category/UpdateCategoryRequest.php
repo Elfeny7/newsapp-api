@@ -14,11 +14,11 @@ class UpdateCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'        => 'required|string|max:255',
-            'slug'        => 'required|string|max:255|regex:/^[a-z0-9-]+$/|unique:categories,slug,' . $this->route('category'),
-            'description' => 'required|string',
-            'parent_id'   => 'nullable|integer|exists:categories,id',
-            'status'      => 'required|string|in:active,inactive',
+            'name'        => 'sometimes|string|max:255',
+            'slug'        => 'sometimes|string|max:255|regex:/^[a-z0-9-]+$/|unique:categories,slug,' . $this->route('category'),
+            'description' => 'sometimes|string',
+            'parent_id'   => 'sometimes|integer|exists:categories,id',
+            'status'      => 'sometimes|string|in:active,inactive',
         ];
     }
 
