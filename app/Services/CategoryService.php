@@ -22,29 +22,29 @@ class CategoryService implements CategoryServiceInterface
 
     public function getAllCategory()
     {
-        return $this->categoryRepositoryInterface->getAllCategory();
+        return $this->categoryRepositoryInterface->getAll();
     }
 
     public function createCategory(array $payload)
     {
         DB::beginTransaction();
         try {
-            $categoryDetails = [
+            $data = [
                 'name'   => $payload['name'],
                 'slug'   => $payload['slug'],
                 'description'   => $payload['description'],
                 'parent_id' => $payload['parent_id'],
                 'status' => $payload['status'],
             ];
-            $category = $this->categoryRepositoryInterface->createCategory($categoryDetails);
+            $category = $this->categoryRepositoryInterface->create($data);
 
             DB::commit();
-            CategoryLogger::created($category, $this->authServiceInterface->getAuthenticatedUser());
+            CategoryLogger::created($category, $this->authServiceInterface->getUser());
 
             return $category;
         } catch (\Exception $e) {
             DB::rollBack();
-            CategoryLogger::createFailed($payload, $this->authServiceInterface->getAuthenticatedUser(), $e);
+            CategoryLogger::createFailed($payload, $this->authServiceInterface->getUser(), $e);
 
             throw $e;
         }
@@ -52,7 +52,7 @@ class CategoryService implements CategoryServiceInterface
 
     public function getCategoryById(int $id)
     {
-        return $this->categoryRepositoryInterface->getCategoryById($id);
+        return $this->categoryRepositoryInterface->getById($id);
     }
 
     public function updateCategory(array $payload, int $id)
@@ -60,22 +60,22 @@ class CategoryService implements CategoryServiceInterface
         DB::beginTransaction();
 
         try {
-            $existingCategory = $this->categoryRepositoryInterface->getCategoryById($id);
-            $updateDetails = [
-                'name'   => $payload['name'] ?? $existingCategory->name,
-                'slug' => $payload['slug'] ?? $existingCategory->slug,
-                'description' => $payload['description'] ?? $existingCategory->description,
-                'parent_id' => $payload['parent_id'] ?? $existingCategory->parent_id,
-                'status' => $payload['status'] ?? $existingCategory->status,
+            $prev = $this->categoryRepositoryInterface->getById($id);
+            $data = [
+                'name'   => $payload['name'] ?? $prev->name,
+                'slug' => $payload['slug'] ?? $prev->slug,
+                'description' => $payload['description'] ?? $prev->description,
+                'parent_id' => $payload['parent_id'] ?? $prev->parent_id,
+                'status' => $payload['status'] ?? $prev->status,
             ];
 
-            $this->categoryRepositoryInterface->updateCategory($updateDetails, $id);
+            $this->categoryRepositoryInterface->update($data, $id);
             DB::commit();
 
-            CategoryLogger::updated($updateDetails, $existingCategory, $this->authServiceInterface->getAuthenticatedUser());
+            CategoryLogger::updated($data, $prev, $this->authServiceInterface->getUser());
         } catch (\Exception $e) {
             DB::rollBack();
-            CategoryLogger::updateFailed($payload, $existingCategory, $this->authServiceInterface->getAuthenticatedUser(), $e);
+            CategoryLogger::updateFailed($payload, $prev, $this->authServiceInterface->getUser(), $e);
 
             throw $e;
         }
@@ -83,15 +83,15 @@ class CategoryService implements CategoryServiceInterface
 
     public function deleteCategory(int $id)
     {
-        $existingCategory = $this->getCategoryById($id);
+        $prev = $this->getCategoryById($id);
         try {
             DB::transaction(function () use ($id) {
-                $this->categoryRepositoryInterface->deleteCategory($id);
+                $this->categoryRepositoryInterface->delete($id);
             });
 
-            CategoryLogger::deleted($existingCategory, $this->authServiceInterface->getAuthenticatedUser());
+            CategoryLogger::deleted($prev, $this->authServiceInterface->getUser());
         } catch (\Exception $e) {
-            CategoryLogger::deleteFailed($existingCategory, $this->authServiceInterface->getAuthenticatedUser(), $e);
+            CategoryLogger::deleteFailed($prev, $this->authServiceInterface->getUser(), $e);
             
             throw $e;
         }

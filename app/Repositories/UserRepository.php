@@ -7,27 +7,27 @@ use App\Interfaces\UserRepositoryInterface;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function createUser(array $data)
+    public function create(array $data)
     {
         return User::create($data);
     }
 
-    public function getAllUsers()
+    public function getAll()
     {
         return User::all();
     }
 
-    public function getUserById($id)
+    public function getById($id)
     {
         return User::findOrFail($id);
     }
 
-    public function updateUser(array $data, $id)
+    public function update(array $data, $id)
     {
         return User::whereId($id)->update($data);
     }
 
-    public function deleteUser($id)
+    public function delete($id)
     {
         User::destroy($id);
     }

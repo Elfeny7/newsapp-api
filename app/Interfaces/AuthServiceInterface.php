@@ -7,6 +7,6 @@ interface AuthServiceInterface
     public function register(array $payload);
     public function login(array $credentials);
     public function logout();
-    public function getAuthenticatedUser();
+    public function getUser();
     public function refresh();
 }

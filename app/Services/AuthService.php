@@ -25,7 +25,7 @@ class AuthService implements AuthServiceInterface
     {
         return DB::transaction(function () use ($payload) {
             try {
-                $user = $this->userRepositoryInterface->createUser($payload);
+                $user = $this->userRepositoryInterface->create($payload);
                 $token = $this->tokenServiceInterface->generate($user);
                 AuthLogger::registerSuccess($user);
 
@@ -45,7 +45,7 @@ class AuthService implements AuthServiceInterface
             throw new InvalidCredentialsException();
         }
 
-        $user = $this->getAuthenticatedUser();
+        $user = $this->getUser();
         AuthLogger::loginSuccess($user);
 
         return [
@@ -59,14 +59,14 @@ class AuthService implements AuthServiceInterface
     {
         try {
             $this->tokenServiceInterface->invalidate();
-            AuthLogger::logoutSuccess($this->getAuthenticatedUser());
+            AuthLogger::logoutSuccess($this->getUser());
         } catch (\Exception $e) {
-            AuthLogger::logoutFailed($this->getAuthenticatedUser(), $e->getMessage());
+            AuthLogger::logoutFailed($this->getUser(), $e->getMessage());
             throw $e;
         }
     }
 
-    public function getAuthenticatedUser()
+    public function getUser()
     {
         $user = $this->tokenServiceInterface->getUser();
         if (!$user) {

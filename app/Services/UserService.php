@@ -21,25 +21,25 @@ class UserService implements UserServiceInterface
 
     public function getAllUsers()
     {
-        return $this->userRepositoryInterface->getAllUsers();
+        return $this->userRepositoryInterface->getAll();
     }
 
     public function getUserById(int $id)
     {
-        return $this->userRepositoryInterface->getUserById($id);
+        return $this->userRepositoryInterface->getById($id);
     }
 
     public function createUser(array $payload)
     {
         DB::beginTransaction();
         try {
-            $user = $this->userRepositoryInterface->createUser($payload);
+            $user = $this->userRepositoryInterface->create($payload);
             DB::commit();
-            UserLogger::createSuccess($payload, $this->authServiceInterface->getAuthenticatedUser());
+            UserLogger::createSuccess($payload, $this->authServiceInterface->getUser());
             return $user;
         } catch (\Exception $e) {
             DB::rollBack();
-            UserLogger::createFailed($payload, $e->getMessage(), $this->authServiceInterface->getAuthenticatedUser());
+            UserLogger::createFailed($payload, $e->getMessage(), $this->authServiceInterface->getUser());
             throw $e;
         }
     }
@@ -48,13 +48,13 @@ class UserService implements UserServiceInterface
     {
         DB::beginTransaction();
         try {
-            $existingUser = $this->userRepositoryInterface->getUserById($id);
-            $this->userRepositoryInterface->updateUser($payload, $id);
+            $existingUser = $this->userRepositoryInterface->getById($id);
+            $this->userRepositoryInterface->update($payload, $id);
             DB::commit();
-            UserLogger::updateSuccess($payload, $existingUser, $this->authServiceInterface->getAuthenticatedUser());
+            UserLogger::updateSuccess($payload, $existingUser, $this->authServiceInterface->getUser());
         } catch (\Exception $e) {
             DB::rollBack();
-            UserLogger::updateFailed($payload, $existingUser, $e->getMessage(), $this->authServiceInterface->getAuthenticatedUser());
+            UserLogger::updateFailed($payload, $existingUser, $e->getMessage(), $this->authServiceInterface->getUser());
             throw $e;
         }
     }
@@ -62,10 +62,10 @@ class UserService implements UserServiceInterface
     public function deleteUser(int $id)
     {
         try {
-            $this->userRepositoryInterface->deleteUser($id);
-            UserLogger::deleteSuccess($id, $this->authServiceInterface->getAuthenticatedUser());
+            $this->userRepositoryInterface->delete($id);
+            UserLogger::deleteSuccess($id, $this->authServiceInterface->getUser());
         } catch (\Exception $e) {
-            UserLogger::deleteFailed($id, $e->getMessage(), $this->authServiceInterface->getAuthenticatedUser());
+            UserLogger::deleteFailed($id, $e->getMessage(), $this->authServiceInterface->getUser());
             throw $e;
         }
     }
