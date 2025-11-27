@@ -6,7 +6,7 @@ use App\Http\Requests\News\StoreNewsRequest;
 use App\Http\Requests\News\UpdateNewsRequest;
 use App\Interfaces\NewsServiceInterface;
 use App\Http\Resources\NewsResource;
-use App\Support\ApiResponse;
+use App\Helper\ApiResponse;
 
 class NewsController extends Controller
 {

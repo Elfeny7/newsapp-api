@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\ApiResponse;
+use App\Helper\ApiResponse;
 use App\Interfaces\AuthServiceInterface;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Requests\Auth\LoginUserRequest;
