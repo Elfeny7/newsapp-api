@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Support\ApiResponse;
 use App\Interfaces\UserServiceInterface;
-use App\Http\Requests\Auth\StoreUserRequest;
-use App\Http\Requests\Auth\UpdateUserRequest;
+use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 
 class UserController extends Controller
