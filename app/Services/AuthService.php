@@ -14,7 +14,7 @@ class AuthService implements AuthServiceInterface
 {
     private UserRepositoryInterface $userRepositoryInterface;
     private TokenServiceInterface $tokenServiceInterface;
-    
+
     public function __construct(UserRepositoryInterface $userRepositoryInterface, TokenServiceInterface $tokenServiceInterface)
     {
         $this->userRepositoryInterface = $userRepositoryInterface;
@@ -23,18 +23,18 @@ class AuthService implements AuthServiceInterface
 
     public function register(array $payload)
     {
-        return DB::transaction(function () use ($payload) {
-            try {
-                $user = $this->userRepositoryInterface->create($payload);
-                $token = $this->tokenServiceInterface->generate($user);
-                AuthLogger::registerSuccess($user);
+        try {
+            $user = DB::transaction(function () use ($payload) {
+                return $this->userRepositoryInterface->create($payload);
+            });
+            $token = $this->tokenServiceInterface->generate($user);
+            AuthLogger::registerSuccess($user);
 
-                return compact('user', 'token');
-            } catch (\Exception $e) {
-                AuthLogger::registerFailed($payload['email'], $e->getMessage());
-                throw $e;
-            }
-        });
+            return compact('user', 'token');
+        } catch (\Exception $e) {
+            AuthLogger::registerFailed($payload['email'], $e->getMessage());
+            throw $e;
+        }
     }
 
     public function login(array $credentials)
