@@ -46,7 +46,7 @@ class AuthController extends Controller
 
     public function getUser()
     {
-        $user = new UserResource($this->authServiceInterface->getAuthenticatedUser());
+        $user = new UserResource($this->authServiceInterface->getUser());
         return ApiResponse::success($user, 'User Retrieved', 200);
     }
 
