@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support;
+namespace App\Helper;
 
 use Illuminate\Support\Facades\Log;
 
