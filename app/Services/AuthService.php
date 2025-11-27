@@ -24,6 +24,7 @@ class AuthService implements AuthServiceInterface
     public function register(array $payload)
     {
         try {
+            $payload['role'] = 'viewer';
             $user = DB::transaction(function () use ($payload) {
                 return $this->userRepositoryInterface->create($payload);
             });
