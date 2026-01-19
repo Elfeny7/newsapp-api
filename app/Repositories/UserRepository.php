@@ -24,11 +24,13 @@ class UserRepository implements UserRepositoryInterface
 
     public function update(array $data, $id)
     {
-        return User::whereId($id)->update($data);
+        $user = User::findOrFail($id);
+        $user->update($data);
+        return $user;
     }
 
     public function delete($id)
     {
-        User::destroy($id);
+        User::findOrFail($id)->delete();
     }
 }

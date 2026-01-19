@@ -17,18 +17,20 @@ class NewsRepository implements NewsRepositoryInterface
         return News::findOrFail($id);
     }
 
-    public function create(array $newsDetails)
+    public function create(array $data)
     {
-        return News::create($newsDetails);
+        return News::create($data);
     }
 
-    public function update(array $newsDetails, int $id)
+    public function update(array $data, int $id)
     {
-        return News::whereId($id)->update($newsDetails);
+        $news = News::findOrFail($id);
+        $news->update($data);
+        return $news;
     }
 
     public function delete(int $id)
     {
-        News::destroy($id);
+        News::findOrFail($id)->delete();
     }
 }

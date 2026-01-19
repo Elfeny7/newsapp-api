@@ -24,11 +24,13 @@ class CategoryRepository implements CategoryRepositoryInterface
 
     public function update(array $data, int $id)
     {
-        return Category::whereId($id)->update($data);
+        $category = Category::findOrFail($id);
+        $category->update($data);
+        return $category;
     }
 
     public function delete(int $id)
     {
-        Category::destroy($id);
+        Category::findOrFail($id)->delete();
     }
 }
