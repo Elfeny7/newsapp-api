@@ -6,8 +6,6 @@ use App\Interfaces\CategoryServiceInterface;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\AuthServiceInterface;
 use App\Logging\CategoryLogger;
-use Illuminate\Support\Facades\DB;
-
 
 class CategoryService implements CategoryServiceInterface
 {
@@ -27,7 +25,6 @@ class CategoryService implements CategoryServiceInterface
 
     public function createCategory(array $payload)
     {
-        DB::beginTransaction();
         try {
             $data = [
                 'name'   => $payload['name'],
@@ -37,13 +34,10 @@ class CategoryService implements CategoryServiceInterface
                 'status' => $payload['status'],
             ];
             $category = $this->repo->create($data);
-
-            DB::commit();
             CategoryLogger::created($category, $this->auth->getUser());
 
             return $category;
         } catch (\Exception $e) {
-            DB::rollBack();
             CategoryLogger::createFailed($payload, $this->auth->getUser(), $e);
 
             throw $e;
@@ -57,8 +51,6 @@ class CategoryService implements CategoryServiceInterface
 
     public function updateCategory(array $payload, int $id)
     {
-        DB::beginTransaction();
-
         try {
             $prev = $this->repo->getById($id);
             $data = [
@@ -68,15 +60,11 @@ class CategoryService implements CategoryServiceInterface
                 'parent_id' => $payload['parent_id'] ?? $prev->parent_id,
                 'status' => $payload['status'] ?? $prev->status,
             ];
-
             $this->repo->update($data, $id);
-            DB::commit();
-
             CategoryLogger::updated($data, $prev, $this->auth->getUser());
         } catch (\Exception $e) {
-            DB::rollBack();
             CategoryLogger::updateFailed($payload, $prev, $this->auth->getUser(), $e);
-
+            
             throw $e;
         }
     }
@@ -85,10 +73,7 @@ class CategoryService implements CategoryServiceInterface
     {
         $prev = $this->getCategoryById($id);
         try {
-            DB::transaction(function () use ($id) {
-                $this->repo->delete($id);
-            });
-
+            $this->repo->delete($id);
             CategoryLogger::deleted($prev, $this->auth->getUser());
         } catch (\Exception $e) {
             CategoryLogger::deleteFailed($prev, $this->auth->getUser(), $e);

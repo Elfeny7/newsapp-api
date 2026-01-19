@@ -6,9 +6,7 @@ use App\Interfaces\NewsServiceInterface;
 use App\Interfaces\NewsRepositoryInterface;
 use App\Interfaces\AuthServiceInterface;
 use App\Logging\NewsLogger;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
 
 class NewsService implements NewsServiceInterface
 {
@@ -28,16 +26,17 @@ class NewsService implements NewsServiceInterface
 
     public function createNews(array $payload)
     {
-        DB::beginTransaction();
+        $image = $payload['image'];
+        $imageName = $image->hashName();
+
         try {
-            $image = $payload['image'];
-            $imageName = $image->hashName();
             Storage::disk('public')->putFileAs('news', $image, $imageName);
 
+            // db transaction closure start here
             $newsDetails = [
                 'title'   => $payload['title'],
                 'category_id' => $payload['category_id'],
-                'slug'   => $payload['slug'],
+                'slug'    => $payload['slug'],
                 'excerpt' => $payload['excerpt'],
                 'content' => $payload['content'],
                 'status'  => $payload['status'],
@@ -46,19 +45,18 @@ class NewsService implements NewsServiceInterface
                 'views'   => 0,
                 'image'   => $imageName,
             ];
-            $news = $this->repo->create($newsDetails);
+            $news =  $this->repo->create($newsDetails);
+            // db transaction closure end here
 
-            DB::commit();
             NewsLogger::created($news, $this->auth->getUser());
 
             return $news;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             if (!empty($imageName) && Storage::disk('public')->exists('news/' . $imageName)) {
                 Storage::disk('public')->delete('news/' . $imageName);
             }
-
-            DB::rollBack();
             NewsLogger::createFailed($payload, $this->auth->getUser(), $e);
+
             throw $e;
         }
     }
@@ -74,8 +72,6 @@ class NewsService implements NewsServiceInterface
         $hasNewImage = false;
         $oldImage = null;
 
-        DB::beginTransaction();
-
         try {
             $existingNews = $this->repo->getById($id);
             $oldImage = $existingNews->image;
@@ -86,6 +82,7 @@ class NewsService implements NewsServiceInterface
                 Storage::disk('public')->putFileAs('news', $payload['image'], $imageName);
             }
 
+            // db transaction closure start here
             $updateDetails = [
                 'title'   => $payload['title'] ?? $existingNews->title,
                 'slug'    => $payload['slug'] ?? $existingNews->slug,
@@ -104,7 +101,7 @@ class NewsService implements NewsServiceInterface
             }
 
             $this->repo->update($updateDetails, $id);
-            DB::commit();
+            // db transaction closure end here
 
             if ($hasNewImage && $oldImage && Storage::disk('public')->exists('news/' . $oldImage)) {
                 Storage::disk('public')->delete('news/' . $oldImage);
@@ -112,8 +109,6 @@ class NewsService implements NewsServiceInterface
 
             NewsLogger::updated($updateDetails, $existingNews, $this->auth->getUser());
         } catch (\Exception $e) {
-            DB::rollBack();
-
             if (!empty($imageName) && Storage::disk('public')->exists('news/' . $imageName)) {
                 Storage::disk('public')->delete('news/' . $imageName);
             }
@@ -127,9 +122,7 @@ class NewsService implements NewsServiceInterface
     {
         $existingNews = $this->getNewsById($id);
         try {
-            DB::transaction(function () use ($id) {
-                $this->repo->delete($id);
-            });
+            $this->repo->delete($id);
 
             if ($existingNews->image && Storage::disk('public')->exists('news/' . $existingNews->image)) {
                 Storage::disk('public')->delete('news/' . $existingNews->image);

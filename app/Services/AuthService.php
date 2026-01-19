@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\AuthServiceInterface;
 use App\Interfaces\TokenServiceInterface;
@@ -25,12 +24,9 @@ class AuthService implements AuthServiceInterface
     {
         try {
             $payload['role'] = 'viewer';
-            $user = DB::transaction(function () use ($payload) {
-                return $this->repo->create($payload);
-            });
+            $user = $this->repo->create($payload);
             $token = $this->tokenService->generate($user);
             AuthLogger::registerSuccess($user);
-
             return compact('user', 'token');
         } catch (\Exception $e) {
             AuthLogger::registerFailed($payload['email'], $e->getMessage());
