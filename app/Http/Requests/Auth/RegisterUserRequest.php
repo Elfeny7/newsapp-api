@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Hash;
 
 class RegisterUserRequest extends FormRequest
 {
@@ -18,15 +17,6 @@ class RegisterUserRequest extends FormRequest
             'name'      => 'required|string|max:255',
             'email'     => 'required|string|email|max:255|unique:users,email',
             'password'  => 'required|string|min:6|confirmed',
-        ];
-    }
-
-    public function getRegisterPayload(): array
-    {
-        return [
-            'name'     => $this->input('name'),
-            'email'    => $this->input('email'),
-            'password' => Hash::make($this->password)
         ];
     }
 }

@@ -34,14 +34,14 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $this->authorize('manage', 'manage-user');
-        $user = $this->userServiceInterface->createUser($request->getStorePayload());
+        $user = $this->userServiceInterface->createUser($request->validated());
         return ApiResponse::success(new UserResource($user), 'User Create successsful', 201);
     }
 
     public function update(UpdateUserRequest $request, int $id)
     {
         $this->authorize('manage', 'manage-user');
-        $this->userServiceInterface->updateUser($request->getUpdatePayload(), $id);
+        $this->userServiceInterface->updateUser($request->validated(), $id);
         return ApiResponse::success('', 'User Update successsful', 200);
     }
 

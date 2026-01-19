@@ -3,7 +3,6 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Hash;
 
 class StoreUserRequest extends FormRequest
 {
@@ -19,16 +18,6 @@ class StoreUserRequest extends FormRequest
             'email'     => 'required|string|email|max:255|unique:users,email',
             'password'  => 'required|string|min:6',
             'role'      => 'required|string'
-        ];
-    }
-
-    public function getStorePayload(): array
-    {
-        return [
-            'name'      => $this->input('name'),
-            'email'     => $this->input('email'),
-            'password'  => Hash::make($this->input('password')),
-            'role'      => $this->input('role')
         ];
     }
 }

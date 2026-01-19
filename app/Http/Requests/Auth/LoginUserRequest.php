@@ -18,9 +18,4 @@ class LoginUserRequest extends FormRequest
             'password'  => 'required',
         ];
     }
-
-    public function getCredentials(): array
-    {
-        return $this->only('email', 'password');
-    }
 }

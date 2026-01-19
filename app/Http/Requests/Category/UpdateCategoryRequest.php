@@ -21,15 +21,4 @@ class UpdateCategoryRequest extends FormRequest
             'status'      => 'sometimes|string|in:active,inactive',
         ];
     }
-
-    public function getUpdateCategoryPayload(): array
-    {
-        return [
-            'name'        => $this->input('name'),
-            'slug'        => $this->input('slug'),
-            'description' => $this->input('description'),
-            'parent_id'   => $this->input('parent_id'),
-            'status'      => $this->input('status'),
-        ];
-    }
 }

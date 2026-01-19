@@ -19,7 +19,7 @@ class AuthController extends Controller
 
     public function register(RegisterUserRequest $request)
     {
-        $data = $this->authServiceInterface->register($request->getRegisterPayload());
+        $data = $this->authServiceInterface->register($request->validated());
         $responseData = [
             'user' => new UserResource($data['user']),
             'token' => $data['token']
@@ -29,7 +29,7 @@ class AuthController extends Controller
 
     public function login(LoginUserRequest $request)
     {
-        $data = $this->authServiceInterface->login($request->getCredentials());
+        $data = $this->authServiceInterface->login($request->validated());
         $responseData = [
             'user' => new UserResource($data['user']),
             'token' => $data['token'],

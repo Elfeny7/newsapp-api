@@ -21,15 +21,4 @@ class StoreCategoryRequest extends FormRequest
             'status'      => 'required|string|in:active,inactive',
         ];
     }
-
-    public function getStoreCategoryPayload(): array
-    {
-        return [
-            'name'        => $this->input('name'),
-            'slug'        => $this->input('slug'),
-            'description' => $this->input('description'),
-            'parent_id'   => $this->input('parent_id'),
-            'status'      => $this->input('status'),
-        ];
-    }
 }

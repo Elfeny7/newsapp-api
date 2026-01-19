@@ -3,7 +3,6 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Hash;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -20,16 +19,5 @@ class UpdateUserRequest extends FormRequest
             'password' => 'sometimes|string|min:6',
             'role'     => 'sometimes|string'
         ];
-    }
-
-    public function getUpdatePayload(): array
-    {
-        $payload = $this->only(['name', 'email', 'role']);
-
-        if ($this->filled('password')) {
-            $payload['password'] = Hash::make($this->password);
-        }
-
-        return $payload;
     }
 }

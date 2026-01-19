@@ -26,7 +26,7 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request)
     {
         $this->authorize('create', 'manage-category');
-        $category = $this->categoryServiceInterface->createCategory($request->getStoreCategoryPayload());
+        $category = $this->categoryServiceInterface->createCategory($request->validated());
         return ApiResponse::success(new CategoryResource($category), 'Category Create successsful', 201);
     }
 
@@ -39,7 +39,7 @@ class CategoryController extends Controller
     public function update(UpdateCategoryRequest $request, int $id)
     {
         $this->authorize('update', 'manage-category');
-        $this->categoryServiceInterface->updateCategory($request->getUpdateCategoryPayload(), $id);
+        $this->categoryServiceInterface->updateCategory($request->validated(), $id);
         return ApiResponse::success('', 'Category Update successsful', 200);
     }
 
