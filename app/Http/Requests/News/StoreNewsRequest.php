@@ -11,6 +11,13 @@ class StoreNewsRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'published_at' => $this->status === 'published' ? now() : null,
+        ]);
+    }
+
     public function rules(): array
     {
         return [
@@ -21,20 +28,7 @@ class StoreNewsRequest extends FormRequest
             'content'      => 'required|string',
             'category_id'  => 'required|integer|exists:categories,id',
             'status'       => 'required|string|in:draft,published',
-        ];
-    }
-
-    public function getStoreNewsPayload(): array
-    {
-        return [
-            'image'        => $this->file('image'),
-            'title'        => $this->input('title'),
-            'slug'         => $this->input('slug'),
-            'excerpt'      => $this->input('excerpt'),
-            'content'      => $this->input('content'),
-            'category_id'  => $this->input('category_id'),
-            'status'       => $this->input('status'),
-            'published_at' => $this->input('status') === 'published' ? now() : null,
+            'published_at' => 'nullable|date',
         ];
     }
 }

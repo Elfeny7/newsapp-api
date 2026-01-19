@@ -26,7 +26,9 @@ class NewsController extends Controller
     public function store(StoreNewsRequest $request)
     {
         $this->authorize('create', 'manage-news');
-        $news = $this->newsServiceInterface->createNews($request->getStoreNewsPayload());
+        $data = $request->validated();
+        $data['image'] = $request->file('image');
+        $news = $this->newsServiceInterface->createNews($data);
         return ApiResponse::success(new NewsResource($news), 'News Create successsful', 201);
     }
 
@@ -39,7 +41,9 @@ class NewsController extends Controller
     public function update(UpdateNewsRequest $request, int $id)
     {
         $this->authorize('update',  $this->newsServiceInterface->getNewsById($id));
-        $this->newsServiceInterface->updateNews($request->getUpdateNewsPayload(), $id);
+        $data = $request->validated();
+        $data['image'] = $request->file('image');
+        $this->newsServiceInterface->updateNews($request->validated(), $id);
         return ApiResponse::success('', 'News Update successsful', 200);
     }
 
