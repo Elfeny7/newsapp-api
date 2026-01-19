@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Helper\ApiResponse;
+use App\Http\Responses\ApiResponse;
 use App\Interfaces\UserServiceInterface;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
