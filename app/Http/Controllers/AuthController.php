@@ -10,16 +10,16 @@ use App\Http\Resources\UserResource;
 
 class AuthController extends Controller
 {
-    private AuthServiceInterface $authServiceInterface;
+    private AuthServiceInterface $service;
 
-    public function __construct(AuthServiceInterface $authServiceInterface)
+    public function __construct(AuthServiceInterface $service)
     {
-        $this->authServiceInterface = $authServiceInterface;
+        $this->service = $service;
     }
 
     public function register(RegisterUserRequest $request)
     {
-        $data = $this->authServiceInterface->register($request->validated());
+        $data = $this->service->register($request->validated());
         $responseData = [
             'user' => new UserResource($data['user']),
             'token' => $data['token']
@@ -29,7 +29,7 @@ class AuthController extends Controller
 
     public function login(LoginUserRequest $request)
     {
-        $data = $this->authServiceInterface->login($request->validated());
+        $data = $this->service->login($request->validated());
         $responseData = [
             'user' => new UserResource($data['user']),
             'token' => $data['token'],
@@ -40,19 +40,19 @@ class AuthController extends Controller
 
     public function logout()
     {
-        $this->authServiceInterface->logout();
+        $this->service->logout();
         return ApiResponse::success('', 'Logout Successful', 200);
     }
 
     public function getUser()
     {
-        $user = new UserResource($this->authServiceInterface->getUser());
+        $user = new UserResource($this->service->getUser());
         return ApiResponse::success($user, 'User Retrieved', 200);
     }
 
     public function refresh()
     {
-        $data = $this->authServiceInterface->refresh();
+        $data = $this->service->refresh();
         return ApiResponse::success($data, 'Token Refreshed', 200);
     }
 }

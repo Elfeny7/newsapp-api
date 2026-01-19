@@ -10,45 +10,45 @@ use App\Http\Resources\UserResource;
 
 class UserController extends Controller
 {
-    private UserServiceInterface $userServiceInterface;
+    private UserServiceInterface $service;
 
-    public function __construct(UserServiceInterface $userServiceInterface)
+    public function __construct(UserServiceInterface $service)
     {
-        $this->userServiceInterface = $userServiceInterface;
+        $this->service = $service;
     }
 
     public function index()
     {
         $this->authorize('manage', 'manage-user');
-        $users = $this->userServiceInterface->getAllUsers();
+        $users = $this->service->getAllUsers();
         return ApiResponse::success(UserResource::collection($users), 'Users Retrieved', 200);
     }
 
     public function show(int $id)
     {
         $this->authorize('manage', 'manage-user');
-        $user = $this->userServiceInterface->getUserById($id);
+        $user = $this->service->getUserById($id);
         return ApiResponse::success(new UserResource($user), 'User Retrieved', 200);
     }
 
     public function store(StoreUserRequest $request)
     {
         $this->authorize('manage', 'manage-user');
-        $user = $this->userServiceInterface->createUser($request->validated());
+        $user = $this->service->createUser($request->validated());
         return ApiResponse::success(new UserResource($user), 'User Create successsful', 201);
     }
 
     public function update(UpdateUserRequest $request, int $id)
     {
         $this->authorize('manage', 'manage-user');
-        $this->userServiceInterface->updateUser($request->validated(), $id);
+        $this->service->updateUser($request->validated(), $id);
         return ApiResponse::success('', 'User Update successsful', 200);
     }
 
     public function destroy(int $id)
     {
         $this->authorize('manage', 'manage-user');
-        $this->userServiceInterface->deleteUser($id);
+        $this->service->deleteUser($id);
         return ApiResponse::success('', 'User Delete successsful', 204);
     }
 }

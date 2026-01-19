@@ -12,13 +12,13 @@ use App\Logging\AuthLogger;
 
 class AuthService implements AuthServiceInterface
 {
-    private UserRepositoryInterface $userRepositoryInterface;
-    private TokenServiceInterface $tokenServiceInterface;
+    private UserRepositoryInterface $repo;
+    private TokenServiceInterface $service;
 
-    public function __construct(UserRepositoryInterface $userRepositoryInterface, TokenServiceInterface $tokenServiceInterface)
+    public function __construct(UserRepositoryInterface $repo, TokenServiceInterface $service)
     {
-        $this->userRepositoryInterface = $userRepositoryInterface;
-        $this->tokenServiceInterface = $tokenServiceInterface;
+        $this->repo = $repo;
+        $this->service = $service;
     }
 
     public function register(array $payload)
@@ -26,9 +26,9 @@ class AuthService implements AuthServiceInterface
         try {
             $payload['role'] = 'viewer';
             $user = DB::transaction(function () use ($payload) {
-                return $this->userRepositoryInterface->create($payload);
+                return $this->repo->create($payload);
             });
-            $token = $this->tokenServiceInterface->generate($user);
+            $token = $this->service->generate($user);
             AuthLogger::registerSuccess($user);
 
             return compact('user', 'token');
@@ -40,7 +40,7 @@ class AuthService implements AuthServiceInterface
 
     public function login(array $credentials)
     {
-        $token = $this->tokenServiceInterface->attempt($credentials);
+        $token = $this->service->attempt($credentials);
         if (!$token) {
             AuthLogger::loginFailed($credentials['email']);
             throw new InvalidCredentialsException();
@@ -52,14 +52,14 @@ class AuthService implements AuthServiceInterface
         return [
             'user' => $user,
             'token' => $token,
-            'expires_in' => $this->tokenServiceInterface->getTTL(),
+            'expires_in' => $this->service->getTTL(),
         ];
     }
 
     public function logout()
     {
         try {
-            $this->tokenServiceInterface->invalidate();
+            $this->service->invalidate();
             AuthLogger::logoutSuccess($this->getUser());
         } catch (\Exception $e) {
             AuthLogger::logoutFailed($this->getUser(), $e->getMessage());
@@ -69,7 +69,7 @@ class AuthService implements AuthServiceInterface
 
     public function getUser()
     {
-        $user = $this->tokenServiceInterface->getUser();
+        $user = $this->service->getUser();
         if (!$user) {
             throw new UserNotFoundException();
         }
@@ -78,10 +78,10 @@ class AuthService implements AuthServiceInterface
 
     public function refresh()
     {
-        $token = $this->tokenServiceInterface->refresh();
+        $token = $this->service->refresh();
         return [
             'token' => $token,
-            'expires_in' => $this->tokenServiceInterface->getRefreshTTL(),
+            'expires_in' => $this->service->getRefreshTTL(),
         ];
     }
 }

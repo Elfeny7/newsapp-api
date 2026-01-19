@@ -10,43 +10,43 @@ use App\Http\Resources\CategoryResource;
 
 class CategoryController extends Controller
 {
-    private CategoryServiceInterface $categoryServiceInterface;
+    private CategoryServiceInterface $service;
 
-    public function __construct(CategoryServiceInterface $categoryServiceInterface)
+    public function __construct(CategoryServiceInterface $service)
     {
-        $this->categoryServiceInterface = $categoryServiceInterface;
+        $this->service = $service;
     }
 
     public function index()
     {
-        $data = $this->categoryServiceInterface->getAllCategory();
+        $data = $this->service->getAllCategory();
         return ApiResponse::success(CategoryResource::collection($data), 'Category data retrieved', 200);
     }
 
     public function store(StoreCategoryRequest $request)
     {
         $this->authorize('create', 'manage-category');
-        $category = $this->categoryServiceInterface->createCategory($request->validated());
+        $category = $this->service->createCategory($request->validated());
         return ApiResponse::success(new CategoryResource($category), 'Category Create successsful', 201);
     }
 
     public function show(int $id)
     {
-        $category = $this->categoryServiceInterface->getCategoryById($id);
+        $category = $this->service->getCategoryById($id);
         return ApiResponse::success(new CategoryResource($category), 'Category retrieved', 200);
     }
 
     public function update(UpdateCategoryRequest $request, int $id)
     {
         $this->authorize('update', 'manage-category');
-        $this->categoryServiceInterface->updateCategory($request->validated(), $id);
+        $this->service->updateCategory($request->validated(), $id);
         return ApiResponse::success('', 'Category Update successsful', 200);
     }
 
     public function destroy(int $id)
     {
         $this->authorize('delete', 'manage-category');
-        $this->categoryServiceInterface->deleteCategory($id);
+        $this->service->deleteCategory($id);
         return ApiResponse::success('', 'Category Delete successsful', 204);
     }
 }

@@ -11,18 +11,18 @@ use Illuminate\Support\Facades\DB;
 
 class CategoryService implements CategoryServiceInterface
 {
-    private CategoryRepositoryInterface $categoryRepositoryInterface;
-    private AuthServiceInterface $authServiceInterface;
+    private CategoryRepositoryInterface $repo;
+    private AuthServiceInterface $auth;
 
-    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface, AuthServiceInterface $authServiceInterface)
+    public function __construct(CategoryRepositoryInterface $repo, AuthServiceInterface $auth)
     {
-        $this->categoryRepositoryInterface = $categoryRepositoryInterface;
-        $this->authServiceInterface = $authServiceInterface;
+        $this->repo = $repo;
+        $this->auth = $auth;
     }
 
     public function getAllCategory()
     {
-        return $this->categoryRepositoryInterface->getAll();
+        return $this->repo->getAll();
     }
 
     public function createCategory(array $payload)
@@ -36,15 +36,15 @@ class CategoryService implements CategoryServiceInterface
                 'parent_id' => $payload['parent_id'],
                 'status' => $payload['status'],
             ];
-            $category = $this->categoryRepositoryInterface->create($data);
+            $category = $this->repo->create($data);
 
             DB::commit();
-            CategoryLogger::created($category, $this->authServiceInterface->getUser());
+            CategoryLogger::created($category, $this->auth->getUser());
 
             return $category;
         } catch (\Exception $e) {
             DB::rollBack();
-            CategoryLogger::createFailed($payload, $this->authServiceInterface->getUser(), $e);
+            CategoryLogger::createFailed($payload, $this->auth->getUser(), $e);
 
             throw $e;
         }
@@ -52,7 +52,7 @@ class CategoryService implements CategoryServiceInterface
 
     public function getCategoryById(int $id)
     {
-        return $this->categoryRepositoryInterface->getById($id);
+        return $this->repo->getById($id);
     }
 
     public function updateCategory(array $payload, int $id)
@@ -60,7 +60,7 @@ class CategoryService implements CategoryServiceInterface
         DB::beginTransaction();
 
         try {
-            $prev = $this->categoryRepositoryInterface->getById($id);
+            $prev = $this->repo->getById($id);
             $data = [
                 'name'   => $payload['name'] ?? $prev->name,
                 'slug' => $payload['slug'] ?? $prev->slug,
@@ -69,13 +69,13 @@ class CategoryService implements CategoryServiceInterface
                 'status' => $payload['status'] ?? $prev->status,
             ];
 
-            $this->categoryRepositoryInterface->update($data, $id);
+            $this->repo->update($data, $id);
             DB::commit();
 
-            CategoryLogger::updated($data, $prev, $this->authServiceInterface->getUser());
+            CategoryLogger::updated($data, $prev, $this->auth->getUser());
         } catch (\Exception $e) {
             DB::rollBack();
-            CategoryLogger::updateFailed($payload, $prev, $this->authServiceInterface->getUser(), $e);
+            CategoryLogger::updateFailed($payload, $prev, $this->auth->getUser(), $e);
 
             throw $e;
         }
@@ -86,12 +86,12 @@ class CategoryService implements CategoryServiceInterface
         $prev = $this->getCategoryById($id);
         try {
             DB::transaction(function () use ($id) {
-                $this->categoryRepositoryInterface->delete($id);
+                $this->repo->delete($id);
             });
 
-            CategoryLogger::deleted($prev, $this->authServiceInterface->getUser());
+            CategoryLogger::deleted($prev, $this->auth->getUser());
         } catch (\Exception $e) {
-            CategoryLogger::deleteFailed($prev, $this->authServiceInterface->getUser(), $e);
+            CategoryLogger::deleteFailed($prev, $this->auth->getUser(), $e);
             
             throw $e;
         }
